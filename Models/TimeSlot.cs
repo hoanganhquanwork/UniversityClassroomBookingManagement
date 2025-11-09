@@ -5,7 +5,7 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class TimeSlot
 {
-    public string SlotId { get; set; } = null!;
+    public int SlotId { get; set; }
 
     public TimeOnly StartTime { get; set; }
 

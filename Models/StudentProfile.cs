@@ -5,13 +5,13 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class StudentProfile
 {
-    public string StudentId { get; set; } = null!;
+    public int UserId { get; set; }
 
-    public string FullName { get; set; } = null!;
+    public string? Major { get; set; }
 
-    public string? ClassName { get; set; }
+    public string? Address { get; set; }
 
-    public virtual User Student { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
     public virtual ICollection<RoomRequest> Requests { get; set; } = new List<RoomRequest>();
 }

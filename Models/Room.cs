@@ -5,11 +5,11 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class Room
 {
-    public string RoomId { get; set; } = null!;
+    public int RoomId { get; set; }
 
     public string RoomName { get; set; } = null!;
 
-    public string BuildingId { get; set; } = null!;
+    public int BuildingId { get; set; }
 
     public int? Capacity { get; set; }
 

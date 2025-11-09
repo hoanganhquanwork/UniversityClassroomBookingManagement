@@ -5,25 +5,25 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class Booking
 {
-    public string BookingId { get; set; } = null!;
+    public int BookingId { get; set; }
 
-    public string? RequestId { get; set; }
+    public int? RequestId { get; set; }
 
-    public string RoomId { get; set; } = null!;
+    public int RoomId { get; set; }
 
-    public string SlotId { get; set; } = null!;
+    public int SlotId { get; set; }
 
     public DateOnly Date { get; set; }
 
     public string? Purpose { get; set; }
 
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
-    public string? ApprovedBy { get; set; }
+    public int? ApprovedBy { get; set; }
 
     public string? Status { get; set; }
 
-    public virtual StaffProfile? ApprovedByNavigation { get; set; }
+    public virtual User? ApprovedByNavigation { get; set; }
 
     public virtual User? CreatedByNavigation { get; set; }
 

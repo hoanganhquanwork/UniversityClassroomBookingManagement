@@ -5,13 +5,13 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class RoomRequest
 {
-    public string RequestId { get; set; } = null!;
+    public int RequestId { get; set; }
 
-    public string RequesterId { get; set; } = null!;
+    public int RequesterId { get; set; }
 
-    public string RoomId { get; set; } = null!;
+    public int RoomId { get; set; }
 
-    public string SlotId { get; set; } = null!;
+    public int SlotId { get; set; }
 
     public DateOnly? RequestDate { get; set; }
 
@@ -23,7 +23,7 @@ public partial class RoomRequest
 
     public string? Remark { get; set; }
 
-    public string? ApprovedBy { get; set; }
+    public int? ApprovedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -31,7 +31,7 @@ public partial class RoomRequest
 
     public string? Note { get; set; }
 
-    public virtual StaffProfile? ApprovedByNavigation { get; set; }
+    public virtual User? ApprovedByNavigation { get; set; }
 
     public virtual Booking? Booking { get; set; }
 

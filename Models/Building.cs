@@ -5,7 +5,7 @@ namespace UniversityClassroomBookingManagement.Models;
 
 public partial class Building
 {
-    public string BuildingId { get; set; } = null!;
+    public int BuildingId { get; set; }
 
     public string BuildingName { get; set; } = null!;
 
