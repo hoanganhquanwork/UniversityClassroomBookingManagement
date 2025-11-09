@@ -29,6 +29,8 @@ public partial class RoomRequest
 
     public DateTime? UpdatedAt { get; set; }
 
+    public string? Note { get; set; }
+
     public virtual StaffProfile? ApprovedByNavigation { get; set; }
 
     public virtual Booking? Booking { get; set; }
