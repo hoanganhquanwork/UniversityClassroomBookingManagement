@@ -13,9 +13,6 @@
     <None Remove="Assets\images\background.png" />
     <None Remove="Assets\images\logo.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Repository\" />
-  </ItemGroup>
 	<ItemGroup>
   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
