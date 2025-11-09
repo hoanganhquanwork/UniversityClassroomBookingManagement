@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using UniversityClassroomBookingManagement.Models;
+using UniversityClassroomBookingManagement.Repository;
 
 namespace UniversityClassroomBookingManagement.Views.auth
 {
@@ -19,9 +21,30 @@ namespace UniversityClassroomBookingManagement.Views.auth
     /// </summary>
     public partial class LoginWindow : Window
     {
+        private readonly UserRepository _userRepo = new UserRepository();
+
         public LoginWindow()
         {
             InitializeComponent();
+        }
+        private void btnLogin_Click(object sender, RoutedEventArgs e)
+        {
+            string username = txtUsername.Text.Trim();
+            string password = txtPassword.Password.Trim();
+
+            User? user = _userRepo.Login(username, password);
+
+            if (user != null)
+            {
+                MessageBox.Show($"Chào mừng {user.FullName} ({user.Role})!", "Đăng nhập thành công",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                if (user.Role == "Student" || user.Role == "Lecturer")
+                {
+                    var dashboard = new Views.StudentAndLecturer.DashboardWindow(user);
+                    dashboard.Show();
+                    this.Close();
+                }
+            }
         }
     }
 }

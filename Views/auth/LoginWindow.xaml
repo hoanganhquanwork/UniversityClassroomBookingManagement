@@ -90,7 +90,7 @@
                         FontWeight="Bold"
                         Background="#FF6600" Foreground="White"
                         Padding="12"
-                        Cursor="Hand">
+                        Cursor="Hand" Click="btnLogin_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
