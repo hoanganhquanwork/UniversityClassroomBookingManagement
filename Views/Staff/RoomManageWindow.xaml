@@ -1,0 +1,229 @@
+﻿<Window x:Class="UniversityRoomBooking.Views.RoomManageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Room Management"
+        Height="600" Width="950"
+        Background="#FFF8F8F8">
+
+    <Window.Resources>
+        <!-- 🎨 Button Style (hover + rounded + smooth color) -->
+        <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF808080"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Gray" BlurRadius="8" Direction="270" ShadowDepth="2"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ✏️ TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#FFBBBBBB"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF8888FF"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF3366FF"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 🧭 ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="BorderBrush" Value="#FFBBBBBB"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF8888FF"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF3366FF"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <!-- Filter panel -->
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="🏫 Room Management"
+                   FontSize="26"
+                   FontWeight="Bold"
+                   Foreground="#FF3366FF"
+                   Margin="0,0,0,10"/>
+
+        <!-- FILTER PANEL -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8"
+                BorderBrush="#FFD0D0D0" BorderThickness="1"
+                Padding="10" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <!-- Building filter -->
+                <StackPanel Orientation="Vertical" Margin="10,0">
+                    <TextBlock Text="Filter by Building" FontWeight="Bold" Foreground="#FF444444"/>
+                    <ComboBox x:Name="cbBuildingFilter" Width="200"
+                              DisplayMemberPath="BuildingName"
+                              SelectedValuePath="BuildingId"
+                              />
+                </StackPanel>
+
+                <!-- Search by name -->
+                <StackPanel Orientation="Vertical" Margin="30,0,0,0">
+                    <TextBlock Text="Search by Room Name" FontWeight="Bold" Foreground="#FF444444"/>
+                    <TextBox x:Name="txtSearchName" Width="200" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="30,10,0,0">
+                    <Button Content="🔍 Search" Background="#FF6BAA00" Click="BtnSearch_Click"/>
+                    <Button Content="❌ Clear" Background="#FFB00020" Click="BtnClearFilter_Click"/>
+                </StackPanel>
+
+                <!-- Buttons -->
+            </StackPanel>
+        </Border>
+
+        <!-- DataGrid -->
+        <Border Grid.Row="2" CornerRadius="10"
+                BorderBrush="#FFD0D0D0" BorderThickness="1"
+                Background="White" Padding="10">
+            <DataGrid x:Name="dgvRooms" 
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      SelectionChanged="dgvRooms_SelectionChanged"
+                      GridLinesVisibility="None"
+                      HeadersVisibility="Column"
+                      AlternatingRowBackground="#FFF2F2F2"
+                      RowBackground="White"
+                      BorderThickness="0"
+                      FontSize="14">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding RoomId}" Width="60"/>
+                    <DataGridTextColumn Header="Room Name" Binding="{Binding RoomName}" Width="150"/>
+                    <DataGridTextColumn Header="Building" Binding="{Binding Building.BuildingName}" Width="150"/>
+                    <DataGridTextColumn Header="Capacity" Binding="{Binding Capacity}" Width="100"/>
+                    <DataGridTextColumn Header="Equipment" Binding="{Binding Equipment}" Width="200"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="130"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Form nhập liệu -->
+        <Border Grid.Row="3"
+                Background="White"
+                BorderBrush="#FFD0D0D0"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="15"
+                Margin="0,15,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ROOM NAME -->
+                <StackPanel Margin="10" Grid.Column="0">
+                    <Label Content="Room Name" FontWeight="Bold" Foreground="#FF444444"/>
+                    <TextBox x:Name="txtRoomName" TextChanged="TxtRoomName_TextChanged"/>
+                    <TextBlock x:Name="tbRoomNamePlaceholder"
+                               Text="e.g. A101"
+                               Foreground="Gray"
+                               Margin="10,4,0,0"
+                               IsHitTestVisible="False"
+                               Visibility="Visible"/>
+                </StackPanel>
+
+                <!-- BUILDING -->
+                <StackPanel Margin="10" Grid.Column="1">
+                    <Label Content="Building" FontWeight="Bold" Foreground="#FF444444"/>
+                    <ComboBox x:Name="cbBuilding"
+                              DisplayMemberPath="BuildingName"
+                              SelectedValuePath="BuildingId"/>
+                </StackPanel>
+
+                <!-- CAPACITY -->
+                <StackPanel Margin="10" Grid.Column="2">
+                    <Label Content="Capacity" FontWeight="Bold" Foreground="#FF444444"/>
+                    <TextBox x:Name="txtCapacity" TextChanged="TxtCapacity_TextChanged"/>
+                    <TextBlock x:Name="tbCapacityPlaceholder"
+                               Text="e.g. 60"
+                               Foreground="Gray"
+                               Margin="10,4,0,0"
+                               IsHitTestVisible="False"
+                               Visibility="Visible"/>
+                </StackPanel>
+
+                <!-- EQUIPMENT -->
+                <StackPanel Margin="10" Grid.Column="3">
+                    <Label Content="Equipment" FontWeight="Bold" Foreground="#FF444444"/>
+                    <TextBox x:Name="txtEquipment" TextChanged="TxtEquipment_TextChanged"/>
+                    <TextBlock x:Name="tbEquipmentPlaceholder"
+                               Text="e.g. Projector, Board"
+                               Foreground="Gray"
+                               Margin="10,4,0,0"
+                               IsHitTestVisible="False"
+                               Visibility="Visible"/>
+                </StackPanel>
+
+                <!-- STATUS -->
+                <StackPanel Margin="10" Grid.Column="4">
+                    <Label Content="Status" FontWeight="Bold" Foreground="#FF444444"/>
+                    <ComboBox x:Name="cbStatus">
+                        <ComboBoxItem Content="available"/>
+                        <ComboBoxItem Content="under_maintenance"/>
+                        <ComboBoxItem Content="unauthorized"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- CRUD Buttons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                    VerticalAlignment="Top" Margin="0,148,0,0" Grid.Row="3">
+            <Button Content="➕ Add" Background="#FF6BAA00" Click="BtnAdd_Click"/>
+            <Button Content="✏️ Edit" Background="#FF008CBA" Click="BtnEdit_Click"/>
+            <Button Content="🗑️ Delete" Background="#FFB00020" Click="BtnDelete_Click"/>
+            <Button Content="🔄 Refresh" Background="#FF666666" Click="BtnRefresh_Click"/>
+            <Button Content="⬅️ Back" Background="#FF777777" Click="BtnBack_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

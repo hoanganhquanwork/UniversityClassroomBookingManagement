@@ -42,4 +42,5 @@ public partial class User
     public virtual StaffProfile? StaffProfile { get; set; }
 
     public virtual StudentProfile? StudentProfile { get; set; }
+
 }
