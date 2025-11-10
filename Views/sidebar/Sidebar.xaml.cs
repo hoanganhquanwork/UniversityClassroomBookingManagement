@@ -1,29 +1,55 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using UniversityClassroomBookingManagement.Models;
+using UniversityClassroomBookingManagement.Views.auth;
 
 namespace UniversityClassroomBookingManagement.Views.sidebar
 {
     public partial class Sidebar : UserControl
     {
-        public event EventHandler? MyRequestsClicked;
-        public event EventHandler? BookRoomClicked;
-        public event EventHandler? ProfileClicked;
-        public event EventHandler? LogoutClicked;
+        private User? _currentUser;
 
         public Sidebar()
         {
             InitializeComponent();
+            this.Loaded += Sidebar_Loaded;
         }
 
+        private void Sidebar_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) == null)
+            {
+                MessageBox.Show("Sidebar chưa gắn vào cửa sổ chính!");
+            }
+        }
+
+        public void SetCurrentUser(User user)
+        {
+            _currentUser = user;
+        }
+
+
         private void Nav_MyRequests_Click(object sender, RoutedEventArgs e)
-            => MyRequestsClicked?.Invoke(this, EventArgs.Empty);
+        {
+            if (_currentUser == null) return;
+            var win = new StudentAndLecturer.DashboardWindow(_currentUser);
+            Navigate(win);
+        }
 
         private void Nav_BookRoom_Click(object sender, RoutedEventArgs e)
-            => BookRoomClicked?.Invoke(this, EventArgs.Empty);
+        {
+            //if (_currentUser == null) return;
+            //var win = new StudentAndLecturer.BookRoomWindow(_currentUser);
+            //Navigate(win);
+        }
 
         private void Nav_Profile_Click(object sender, RoutedEventArgs e)
-            => ProfileClicked?.Invoke(this, EventArgs.Empty);
+        {
+            if (_currentUser == null) return;
+            var win = new StudentAndLecturer.UserProfileWindow(_currentUser);
+            Navigate(win);
+        }
 
         private void Nav_Logout_Click(object sender, RoutedEventArgs e)
         {
@@ -32,7 +58,23 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
                                 MessageBoxButton.YesNo,
                                 MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                LogoutClicked?.Invoke(this, EventArgs.Empty);
+                var login = new LoginWindow();
+                Navigate(login);
+            }
+        }
+        private void Navigate(Window newWindow)
+        {
+            // Mở cửa sổ mới
+            newWindow.Show();
+
+            // Đóng các cửa sổ khác (trừ cái mới mở)
+            foreach (Window w in Application.Current.Windows)
+            {
+                if (w != newWindow)
+                {
+                    w.Close();
+                    break;
+                }
             }
         }
     }

@@ -28,7 +28,7 @@ namespace UniversityClassroomBookingManagement.Repositories
             {
                 return _context.RoomRequests
                     .Include(r => r.Room)
-                    .Include(r => r.Slot) 
+                    .Include(r => r.Slot)
                     .Where(r => r.RequesterId == userId)
                     .OrderByDescending(r => r.CreatedAt)
                     .ToList();
@@ -41,7 +41,7 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
         }
 
-     
+
         public bool UpdateRequest(int id, DateOnly newDate, int newRoomId, int newSlotId, string newPurpose)
         {
             try
@@ -156,15 +156,12 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                // 🔸 Lấy danh sách student_id từ bảng RoomRequest_Participant
                 var studentIds = _context.Database
                     .SqlQueryRaw<int>("SELECT student_id FROM RoomRequest_Participant WHERE request_id = {0}", requestId)
                     .ToList();
 
                 if (!studentIds.Any())
                     return new List<User>();
-
-                // 🔸 Join sang bảng Users để lấy thông tin người dùng
                 var students = _context.Users
                     .Where(u => studentIds.Contains(u.UserId))
                     .ToList();
@@ -179,9 +176,6 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
         }
 
-        // ============================================================
-        // 🔹 THÊM HỌC SINH VÀO DANH SÁCH THAM GIA (SQL tạm)
-        // ============================================================
         public bool AddParticipant(int requestId, int studentId)
         {
             try
@@ -199,10 +193,9 @@ namespace UniversityClassroomBookingManagement.Repositories
                     return false;
                 }
 
-                // 🔸 Kiểm tra trùng
-                var exists = _context.Database
-                    .SqlQueryRaw<int>("SELECT COUNT(*) FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}", requestId, studentId)
-                    .FirstOrDefault();
+                int exists = _context.RoomRequests
+    .FromSqlRaw("SELECT * FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}", requestId, studentId)
+    .Count();
 
                 if (exists > 0)
                 {
@@ -210,12 +203,12 @@ namespace UniversityClassroomBookingManagement.Repositories
                     return false;
                 }
 
-                // 🔸 Thêm mới vào bảng trung gian
                 _context.Database.ExecuteSqlRaw(
                     "INSERT INTO RoomRequest_Participant (request_id, student_id) VALUES ({0}, {1})",
                     requestId, studentId);
 
-                MessageBox.Show("Đã thêm học sinh vào danh sách tham gia.", "Thành công");
+                _context.SaveChanges();
+
                 return true;
             }
             catch (Exception ex)
@@ -224,5 +217,82 @@ namespace UniversityClassroomBookingManagement.Repositories
                 return false;
             }
         }
+        public RoomRequest? GetRequestById(int requestId)
+        {
+            try
+            {
+                return _context.RoomRequests
+                    .Include(r => r.Room)
+                    .Include(r => r.Slot)
+                    .Include(r => r.Requester)
+                    .FirstOrDefault(r => r.RequestId == requestId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể tải chi tiết yêu cầu:\n" + ex.Message);
+                return null;
+            }
+        }
+        public bool UpdatePurpose(int id, string newPurpose)
+        {
+            try
+            {
+                var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == id);
+                if (req == null) return false;
+
+                if (req.Status != "pending")
+                {
+                    MessageBox.Show("Chỉ có thể chỉnh sửa yêu cầu đang chờ duyệt.", "Cảnh báo");
+                    return false;
+                }
+
+                req.Purpose = newPurpose;
+                req.UpdatedAt = DateTime.Now;
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi cập nhật mục đích:\n" + ex.Message);
+                return false;
+            }
+        }
+        public bool RemoveParticipant(int requestId, int studentId)
+        {
+            try
+            {
+                _context.Database.ExecuteSqlRaw(
+                    "DELETE FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}",
+                    requestId, studentId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa học sinh:\n" + ex.Message);
+                return false;
+            }
+        }
+        public bool UpdateStaffNote(int requestId, string? note)
+        {
+            try
+            {
+                var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == requestId);
+                if (req == null) return false;
+
+                req.Note = note;
+                req.UpdatedAt = DateTime.Now;
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể cập nhật phản hồi:\n" + ex.Message,
+                    "Lỗi hệ thống", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
     }
 }

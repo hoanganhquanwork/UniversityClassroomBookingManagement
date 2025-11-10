@@ -233,5 +233,21 @@ namespace UniversityClassroomBookingManagement.Repositories
             _context.SaveChanges();
             return true;
         }
+    public bool UpdateProfilePicture(int userId, string newPath)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null) return false;
+
+                user.ProfilePicture = newPath;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
