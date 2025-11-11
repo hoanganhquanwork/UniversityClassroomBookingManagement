@@ -9,7 +9,7 @@
         ResizeMode="NoResize">
 
     <DockPanel>
-        <sidebar:Sidebar DockPanel.Dock="Left"/>
+        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
         <Grid Margin="25">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

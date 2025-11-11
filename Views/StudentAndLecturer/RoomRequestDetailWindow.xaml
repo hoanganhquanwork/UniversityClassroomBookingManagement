@@ -9,7 +9,7 @@
         ResizeMode="NoResize">
 
     <DockPanel>
-        <sidebar:Sidebar DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
+        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="30">
@@ -65,19 +65,19 @@
                             <TextBlock x:Name="txtStatus"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
+                        <StackPanel x:Name="spStaffFeedback" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
                             <TextBlock Text="Staff Feedback:" Width="180" FontWeight="Bold"/>
                             <TextBox x:Name="txtStaffNote"
-                                     Width="600"
-                                     Height="80"
-                                     TextWrapping="Wrap"
-                                     BorderBrush="#DDD"
-                                     BorderThickness="1"
-                                     Padding="5"
-                                     FontSize="13"
-                                     Background="#FAFAFA"
-                                     AcceptsReturn="True"
-                                     IsReadOnly="True"/>
+                                 Width="600"
+                                 Height="80"
+                                 TextWrapping="Wrap"
+                                 BorderBrush="#DDD"
+                                 BorderThickness="1"
+                                 Padding="5"
+                                 FontSize="13"
+                                 Background="#FAFAFA"
+                                 AcceptsReturn="True"
+                                 IsReadOnly="True"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

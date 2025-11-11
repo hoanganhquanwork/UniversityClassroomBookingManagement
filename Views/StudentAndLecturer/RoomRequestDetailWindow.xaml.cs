@@ -1,28 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Microsoft.EntityFrameworkCore;
 using UniversityClassroomBookingManagement.Models;
 using UniversityClassroomBookingManagement.Repositories;
+using UniversityRoomBooking.Repositories;
 
 namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 {
     public partial class RoomRequestDetailWindow : Window
     {
         private readonly RoomRequestRepository _repo;
-        private readonly int _requestId;
+        private readonly RoomRepository _roomRepo;
         private readonly bool _isEditMode;
+        private readonly bool _isAddMode;
+        private readonly User _currentUser;
+        private int _requestId;
         private RoomRequest _request;
-        private List<User> _participants;
+        private List<User> _participants = new();
 
-        public RoomRequestDetailWindow(int requestId, bool isEditMode = false)
+        public RoomRequestDetailWindow(int requestId, User currentUser, bool isEditMode = false)
         {
             InitializeComponent();
             _repo = new RoomRequestRepository();
+            _roomRepo = new RoomRepository();
             _requestId = requestId;
             _isEditMode = isEditMode;
-
+            _isAddMode = false;
+            _currentUser = currentUser;
             LoadData();
             ApplyMode();
+        }
+
+        public RoomRequestDetailWindow(int roomId, int slotId, DateOnly date, User currentUser)
+        {
+            InitializeComponent();
+            _repo = new RoomRequestRepository();
+            _roomRepo = new RoomRepository();
+            _isAddMode = true;
+            _currentUser = currentUser;
+            _request = new RoomRequest
+            {
+                RoomId = roomId,
+                SlotId = slotId,
+                IntendedDate = date,
+                RequesterId = currentUser.UserId,
+                Requester = currentUser,
+                Status = "pending"
+            };
+            ApplyMode_Add();
         }
 
         private void LoadData()
@@ -35,8 +63,10 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 return;
             }
 
+            var room = _roomRepo.GetRoomById(_request.RoomId);
+
             txtRequestId.Text = _request.RequestId.ToString();
-            txtRoom.Text = _request.Room?.RoomName ?? "(Unknown)";
+            txtRoom.Text = room != null ? $"{room.RoomName} ({room.Capacity})" : "(Unknown)";
             txtDate.Text = _request.IntendedDate.ToString("dd/MM/yyyy");
             txtSlot.Text = $"Slot {_request.SlotId}";
             txtStatus.Text = MapStatus(_request.Status);
@@ -79,9 +109,86 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             txtStaffNote.IsReadOnly = true;
         }
 
+        private void ApplyMode_Add()
+        {
+            lblMode.Text = "  |  Create New Request";
+            lblMode.Foreground = new SolidColorBrush(Color.FromRgb(0, 153, 0));
+
+            txtRequestId.Text = "(New)";
+            var room = _roomRepo.GetRoomById(_request.RoomId);
+            txtRoom.Text = room != null ? $"{room.RoomName} ({room.Capacity})" : "(Unknown)";
+            txtDate.Text = _request.IntendedDate.ToString("dd/MM/yyyy");
+            txtSlot.Text = $"Slot {_request.SlotId}";
+            txtStatus.Text = "Pending";
+            spStaffFeedback.Visibility = Visibility.Collapsed;
+
+            txtPurpose.IsReadOnly = false;
+            txtPurpose.Background = Brushes.White;
+
+            if (_currentUser.Role == "Student")
+            {
+                grpParticipants.Visibility = Visibility.Visible;
+                _participants = new List<User>();
+                lstParticipants.ItemsSource = _participants;
+            }
+            else
+            {
+                grpParticipants.Visibility = Visibility.Collapsed;
+            }
+
+            btnSave.Content = "Confirm";
+            btnSave.Visibility = Visibility.Visible;
+        }
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            string newPurpose = txtPurpose.Text.Trim();
+            string purpose = txtPurpose.Text.Trim();
+            if (string.IsNullOrEmpty(purpose))
+            {
+                MessageBox.Show("Please enter a purpose for your booking.", "Warning");
+                return;
+            }
+
+            if (_isAddMode)
+            {
+                try
+                {
+                    var context = new UniversityRoomBookingContext();
+                    var newRequest = new RoomRequest
+                    {
+                        RequesterId = _currentUser.UserId,
+                        RoomId = _request.RoomId,
+                        SlotId = _request.SlotId,
+                        IntendedDate = _request.IntendedDate,
+                        Purpose = purpose,
+                        Status = "pending",
+                        CreatedAt = DateTime.Now
+                    };
+                    context.RoomRequests.Add(newRequest);
+                    context.SaveChanges();
+
+                    if (_currentUser.Role == "Student" && _participants.Count > 0)
+                    {
+                        foreach (User u in _participants)
+                        {
+                            context.Database.ExecuteSqlRaw(
+                                "INSERT INTO RoomRequest_Participant (request_id, student_id) VALUES ({0}, {1})",
+                                newRequest.RequestId, u.UserId);
+                        }
+                        context.SaveChanges();
+                    }
+
+                    MessageBox.Show("Booking request created successfully!", "Success",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error while creating booking request:\n" + ex.Message,
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                return;
+            }
 
             if (_request.Requester?.Role != "Student")
             {
@@ -95,7 +202,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 return;
             }
 
-            if (_repo.UpdatePurpose(_requestId, newPurpose))
+            if (_repo.UpdatePurpose(_requestId, purpose))
             {
                 MessageBox.Show("Changes saved successfully!", "Success");
                 Close();
@@ -104,8 +211,17 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void BtnAddParticipant_Click(object sender, RoutedEventArgs e)
         {
-            var addWindow = new AddParticipantWindow(_requestId);
-            addWindow.ShowDialog();
+            if (_isAddMode)
+            {
+                var addWindow = new AddParticipantWindow(lstParticipants);
+                addWindow.ShowDialog();
+                _participants = lstParticipants.Items.Cast<User>().ToList();
+                lstParticipants.Items.Refresh();
+                return;
+            }
+
+            var addExisting = new AddParticipantWindow(_requestId);
+            addExisting.ShowDialog();
             LoadData();
         }
 
@@ -114,6 +230,17 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             if (lstParticipants.SelectedItem is not User selected)
             {
                 MessageBox.Show("Please select a student to remove.", "Notification");
+                return;
+            }
+
+            if (_isAddMode)
+            {
+                var list = lstParticipants.ItemsSource as List<User>;
+                if (list != null && list.Contains(selected))
+                {
+                    list.Remove(selected);
+                    lstParticipants.Items.Refresh();
+                }
                 return;
             }
 
@@ -139,6 +266,10 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
 
-        private void Sidebar_Loaded(object sender, RoutedEventArgs e) { }
+        private void Sidebar_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser != null)
+                sidebarControl.SetCurrentUser(_currentUser);
+        }
     }
 }

@@ -30,7 +30,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void ShowFilteredList()
         {
-
             string keyword = txtSearch?.Text?.Trim().ToLower() ?? "";
 
             string selectedStatus = ((ComboBoxItem)cboStatus.SelectedItem).Content.ToString();
@@ -43,7 +42,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     || (r.Room != null && r.Room.RoomName.ToLower().Contains(keyword));
 
                 bool matchStatus =
-                    selectedStatus == "Tất cả trạng thái"
+                    selectedStatus == "All Statuses"
                     || MapStatus(r.Status) == selectedStatus;
 
                 return matchKeyword && matchStatus;
@@ -53,8 +52,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             {
                 ID = r.RequestId,
                 Date = r.IntendedDate.ToString("dd/MM/yyyy"),
-                Room = r.Room != null ? r.Room.RoomName : "(Không xác định)",
-                Time = $"Ca {r.SlotId}",
+                Room = r.Room != null ? r.Room.RoomName : "(Unknown)",
+                Time = $"Slot {r.SlotId}",
                 Purpose = r.Purpose,
                 Status = MapStatus(r.Status)
             }).ToList();
@@ -62,13 +61,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private string MapStatus(string? status)
         {
-            if (string.IsNullOrEmpty(status)) return "(Không xác định)";
+            if (string.IsNullOrEmpty(status)) return "(Unknown)";
 
-            if (status == "pending") return "Đang chờ duyệt";
-            else if (status == "approved") return "Đã duyệt";
-            else if (status == "rejected") return "Từ chối";
-            else if (status == "cancelled") return "Đã hủy";
-            else return "(Không xác định)";
+            if (status == "pending") return "Pending";
+            else if (status == "approved") return "Approved";
+            else if (status == "rejected") return "Rejected";
+            else if (status == "cancelled") return "Cancelled";
+            else return "(Unknown)";
         }
 
         private void dgRequests_LoadingRow(object sender, DataGridRowEventArgs e)
@@ -80,7 +79,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để xem chi tiết.", "Thông báo");
+                MessageBox.Show("Please select a request to view details.", "Information");
                 return;
             }
 
@@ -88,17 +87,20 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             int id = selected.ID;
 
             Hide();
-            var w = new RoomRequestDetailWindow(id, false);
-            w.Closed += (s, e2) => { Show(); LoadRequests(); };
+            var w = new RoomRequestDetailWindow(id, _currentUser, false);
+            w.Closed += (s, e2) =>
+            {
+                Show();
+                LoadRequests();
+            };
             w.Show();
         }
-
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để chỉnh sửa.", "Thông báo");
+                MessageBox.Show("Please select a request to edit.", "Information");
                 return;
             }
 
@@ -106,8 +108,12 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             int id = selected.ID;
 
             Hide();
-            var w = new RoomRequestDetailWindow(id, true);
-            w.Closed += (s, e2) => { Show(); LoadRequests(); };
+            var w = new RoomRequestDetailWindow(id, _currentUser, true);
+            w.Closed += (s, e2) =>
+            {
+                Show();
+                LoadRequests();
+            };
             w.Show();
         }
 
@@ -115,15 +121,18 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để xóa.", "Thông báo");
+                MessageBox.Show("Please select a request to delete.", "Information");
                 return;
             }
 
             dynamic selected = dgRequests.SelectedItem;
             int id = selected.ID;
 
-            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa yêu cầu #{id} không?",
-                "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            if (MessageBox.Show(
+                    $"Are you sure you want to delete request #{id}?",
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 bool success = _repo.DeleteRequest(id);
                 if (success)
@@ -135,15 +144,18 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để hủy.", "Thông báo");
+                MessageBox.Show("Please select a request to cancel.", "Information");
                 return;
             }
 
             dynamic selected = dgRequests.SelectedItem;
             int id = selected.ID;
 
-            if (MessageBox.Show($"Xác nhận hủy yêu cầu #{id}?",
-                "Xác nhận hủy", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show(
+                    $"Confirm cancelling request #{id}?",
+                    "Confirm Cancel",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 bool success = _repo.CancelRequest(id);
                 if (success)
@@ -169,8 +181,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 ShowFilteredList();
         }
 
-        private void Sidebar_Loaded(object sender, RoutedEventArgs e) {
-
+        private void Sidebar_Loaded(object sender, RoutedEventArgs e)
+        {
             sidebarControl.SetCurrentUser(_currentUser);
         }
     }

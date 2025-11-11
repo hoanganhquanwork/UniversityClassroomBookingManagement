@@ -38,9 +38,9 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
 
         private void Nav_BookRoom_Click(object sender, RoutedEventArgs e)
         {
-            // if (_currentUser == null) return;
-            // var win = new StudentAndLecturer.BookRoomWindow(_currentUser);
-            // Navigate(win);
+            if (_currentUser == null) return;
+            var win = new StudentAndLecturer.RoomBookingWindow(_currentUser);
+            Navigate(win);
         }
 
         private void Nav_Profile_Click(object sender, RoutedEventArgs e)
