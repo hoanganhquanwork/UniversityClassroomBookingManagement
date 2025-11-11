@@ -30,9 +30,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void ShowFilteredList()
         {
-
             string keyword = txtSearch?.Text?.Trim().ToLower() ?? "";
-
             string selectedStatus = ((ComboBoxItem)cboStatus.SelectedItem).Content.ToString();
 
             var filtered = _allRequests.Where(r =>
@@ -43,7 +41,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     || (r.Room != null && r.Room.RoomName.ToLower().Contains(keyword));
 
                 bool matchStatus =
-                    selectedStatus == "Tất cả trạng thái"
+                    selectedStatus == "All Statuses"
                     || MapStatus(r.Status) == selectedStatus;
 
                 return matchKeyword && matchStatus;
@@ -53,8 +51,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             {
                 ID = r.RequestId,
                 Date = r.IntendedDate.ToString("dd/MM/yyyy"),
-                Room = r.Room != null ? r.Room.RoomName : "(Không xác định)",
-                Time = $"Ca {r.SlotId}",
+                Room = r.Room != null ? r.Room.RoomName : "(Unknown)",
+                Time = $"Slot {r.SlotId}",
                 Purpose = r.Purpose,
                 Status = MapStatus(r.Status)
             }).ToList();
@@ -62,13 +60,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private string MapStatus(string? status)
         {
-            if (string.IsNullOrEmpty(status)) return "(Không xác định)";
+            if (string.IsNullOrEmpty(status)) return "(Unknown)";
 
-            if (status == "pending") return "Đang chờ duyệt";
-            else if (status == "approved") return "Đã duyệt";
-            else if (status == "rejected") return "Từ chối";
-            else if (status == "cancelled") return "Đã hủy";
-            else return "(Không xác định)";
+            if (status == "pending") return "Pending";
+            else if (status == "approved") return "Approved";
+            else if (status == "rejected") return "Rejected";
+            else if (status == "cancelled") return "Cancelled";
+            else return "(Unknown)";
         }
 
         private void dgRequests_LoadingRow(object sender, DataGridRowEventArgs e)
@@ -80,7 +78,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để xem chi tiết.", "Thông báo");
+                MessageBox.Show("Please select a request to view details.", "Notification");
                 return;
             }
 
@@ -93,12 +91,11 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             w.Show();
         }
 
-
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để chỉnh sửa.", "Thông báo");
+                MessageBox.Show("Please select a request to edit.", "Notification");
                 return;
             }
 
@@ -115,15 +112,15 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để xóa.", "Thông báo");
+                MessageBox.Show("Please select a request to delete.", "Notification");
                 return;
             }
 
             dynamic selected = dgRequests.SelectedItem;
             int id = selected.ID;
 
-            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa yêu cầu #{id} không?",
-                "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Are you sure you want to delete request #{id}?",
+                "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 bool success = _repo.DeleteRequest(id);
                 if (success)
@@ -135,15 +132,15 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (dgRequests.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn yêu cầu để hủy.", "Thông báo");
+                MessageBox.Show("Please select a request to cancel.", "Notification");
                 return;
             }
 
             dynamic selected = dgRequests.SelectedItem;
             int id = selected.ID;
 
-            if (MessageBox.Show($"Xác nhận hủy yêu cầu #{id}?",
-                "Xác nhận hủy", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Confirm canceling request #{id}?",
+                "Cancel Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 bool success = _repo.CancelRequest(id);
                 if (success)
@@ -154,24 +151,4 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             txtSearch.Text = "";
-            cboStatus.SelectedIndex = 0;
-            LoadRequests();
-        }
-
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ShowFilteredList();
-        }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsLoaded)
-                ShowFilteredList();
-        }
-
-        private void Sidebar_Loaded(object sender, RoutedEventArgs e) {
-
-            sidebarControl.SetCurrentUser(_currentUser);
-        }
-    }
-}
+            cboStatus.SelectedIndex =

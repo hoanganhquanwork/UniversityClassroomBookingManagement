@@ -17,7 +17,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Thông tin người dùng"
+                <TextBlock Text="User Information"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="#333"
@@ -28,8 +28,7 @@
                         Background="White"
                         CornerRadius="20"
                         BorderBrush="#DDD"
-                        BorderThickness="1"
-                        >
+                        BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -37,7 +36,6 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Avatar -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <Border Width="150" Height="150"
                                     CornerRadius="75"
@@ -51,7 +49,7 @@
                                        Width="150" Height="150"/>
                             </Border>
 
-                            <Button Content="Đổi ảnh"
+                            <Button Content="Change Photo"
                                     Width="120"
                                     Height="35"
                                     Background="#0078D7"
@@ -62,7 +60,6 @@
                                     Click="btnChangePicture_Click"/>
                         </StackPanel>
 
-                        <!-- Form thông tin -->
                         <Grid Grid.Column="2" VerticalAlignment="Center">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -80,32 +77,32 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Họ và tên:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Full Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
                             <TextBox x:Name="txtFullName" Grid.Row="0" Grid.Column="1" Margin="0,5,0,10"/>
 
                             <TextBlock Text="Email:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
                             <TextBox x:Name="txtEmail" Grid.Row="1" Grid.Column="1" Margin="0,5,0,10"/>
 
-                            <TextBlock Text="Số điện thoại:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Phone Number:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
                             <TextBox x:Name="txtPhone" Grid.Row="2" Grid.Column="1" Margin="0,5,0,10"/>
 
-                            <TextBlock Text="Giới tính:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Gender:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
                             <ComboBox x:Name="cbGender" Grid.Row="3" Grid.Column="1" Margin="0,5,0,10">
-                                <ComboBoxItem Tag="male" Content="Nam"/>
-                                <ComboBoxItem Tag="female" Content="Nữ"/>
-                                <ComboBoxItem Tag="other" Content="Khác"/>
+                                <ComboBoxItem Tag="male" Content="Male"/>
+                                <ComboBoxItem Tag="female" Content="Female"/>
+                                <ComboBoxItem Tag="other" Content="Other"/>
                             </ComboBox>
 
-                            <TextBlock Text="Ngày sinh:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Date of Birth:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
                             <DatePicker x:Name="dpDateOfBirth" Grid.Row="4" Grid.Column="1" Margin="0,5,0,10"/>
 
-                            <TextBlock Text="Vai trò:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Role:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
                             <TextBox x:Name="txtRole" Grid.Row="5" Grid.Column="1" IsReadOnly="True" Margin="0,5,0,10"/>
 
-                            <TextBlock Text="Trạng thái:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Status:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
                             <TextBox x:Name="txtStatus" Grid.Row="6" Grid.Column="1" IsReadOnly="True" Margin="0,5,0,20"/>
 
-                            <Button Content="Cập nhật"
+                            <Button Content="Update"
                                     Grid.Row="8" Grid.Column="1"
                                     Width="150"
                                     Height="40"

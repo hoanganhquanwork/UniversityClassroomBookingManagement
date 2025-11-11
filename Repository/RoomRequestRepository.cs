@@ -7,9 +7,6 @@ using UniversityClassroomBookingManagement.Models;
 
 namespace UniversityClassroomBookingManagement.Repositories
 {
-    /// <summary>
-    /// 📘 Repository xử lý các thao tác với bảng RoomRequest (Student + Lecturer)
-    /// </summary>
     public class RoomRequestRepository
     {
         private readonly UniversityRoomBookingContext _context;
@@ -19,9 +16,6 @@ namespace UniversityClassroomBookingManagement.Repositories
             _context = new UniversityRoomBookingContext();
         }
 
-        // ============================================================
-        // 🔹 LẤY DANH SÁCH YÊU CẦU CỦA NGƯỜI DÙNG
-        // ============================================================
         public List<RoomRequest> GetRequestsByUser(int userId)
         {
             try
@@ -35,12 +29,11 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể tải danh sách yêu cầu:\n" + ex.Message,
-                    "Lỗi hệ thống", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Unable to load the request list:\n" + ex.Message,
+                    "System Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new List<RoomRequest>();
             }
         }
-
 
         public bool UpdateRequest(int id, DateOnly newDate, int newRoomId, int newSlotId, string newPurpose)
         {
@@ -49,19 +42,19 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == id);
                 if (req == null)
                 {
-                    MessageBox.Show("Không tìm thấy yêu cầu để sửa.", "Thông báo");
+                    MessageBox.Show("Request not found.", "Notification");
                     return false;
                 }
 
                 if (req.Status != "pending")
                 {
-                    MessageBox.Show("Chỉ có thể sửa yêu cầu đang chờ duyệt.", "Cảnh báo");
+                    MessageBox.Show("Only pending requests can be edited.", "Warning");
                     return false;
                 }
 
                 if (req.IntendedDate < DateOnly.FromDateTime(DateTime.Today))
                 {
-                    MessageBox.Show("Không thể sửa yêu cầu đã qua ngày sử dụng.", "Cảnh báo");
+                    MessageBox.Show("Cannot modify requests for past dates.", "Warning");
                     return false;
                 }
 
@@ -72,19 +65,16 @@ namespace UniversityClassroomBookingManagement.Repositories
                 req.UpdatedAt = DateTime.Now;
 
                 _context.SaveChanges();
-                MessageBox.Show("Đã cập nhật yêu cầu thành công!", "Thành công");
+                MessageBox.Show("Request updated successfully!", "Success");
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi cập nhật yêu cầu:\n" + ex.Message, "Lỗi hệ thống");
+                MessageBox.Show("Error while updating request:\n" + ex.Message, "System Error");
                 return false;
             }
         }
 
-        // ============================================================
-        // 🔹 HỦY YÊU CẦU (chỉ khi đã được DUYỆT)
-        // ============================================================
         public bool CancelRequest(int id)
         {
             try
@@ -92,13 +82,13 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == id);
                 if (req == null)
                 {
-                    MessageBox.Show("Không tìm thấy yêu cầu để hủy.", "Thông báo");
+                    MessageBox.Show("Request not found.", "Notification");
                     return false;
                 }
 
                 if (req.Status != "approved")
                 {
-                    MessageBox.Show("Chỉ có thể hủy yêu cầu đã được duyệt.", "Cảnh báo");
+                    MessageBox.Show("Only approved requests can be canceled.", "Warning");
                     return false;
                 }
 
@@ -106,19 +96,16 @@ namespace UniversityClassroomBookingManagement.Repositories
                 req.UpdatedAt = DateTime.Now;
                 _context.SaveChanges();
 
-                MessageBox.Show("Đã hủy yêu cầu thành công.", "Thành công");
+                MessageBox.Show("Request canceled successfully.", "Success");
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi hủy yêu cầu:\n" + ex.Message, "Lỗi hệ thống");
+                MessageBox.Show("Error while canceling request:\n" + ex.Message, "System Error");
                 return false;
             }
         }
 
-        // ============================================================
-        // 🔹 XÓA YÊU CẦU (chỉ khi đang PENDING)
-        // ============================================================
         public bool DeleteRequest(int id)
         {
             try
@@ -126,32 +113,29 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == id);
                 if (req == null)
                 {
-                    MessageBox.Show("Không tìm thấy yêu cầu để xóa.", "Thông báo");
+                    MessageBox.Show("Request not found.", "Notification");
                     return false;
                 }
 
                 if (req.Status != "pending")
                 {
-                    MessageBox.Show("Chỉ có thể xóa yêu cầu đang chờ duyệt.", "Cảnh báo");
+                    MessageBox.Show("Only pending requests can be deleted.", "Warning");
                     return false;
                 }
 
                 _context.RoomRequests.Remove(req);
                 _context.SaveChanges();
 
-                MessageBox.Show("Đã xóa yêu cầu thành công!", "Thành công");
+                MessageBox.Show("Request deleted successfully!", "Success");
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi xóa yêu cầu:\n" + ex.Message, "Lỗi hệ thống");
+                MessageBox.Show("Error while deleting request:\n" + ex.Message, "System Error");
                 return false;
             }
         }
 
-        // ============================================================
-        // 🔹 LẤY DANH SÁCH HỌC SINH THAM GIA TRONG YÊU CẦU
-        // ============================================================
         public List<User> GetParticipants(int requestId)
         {
             try
@@ -162,6 +146,7 @@ namespace UniversityClassroomBookingManagement.Repositories
 
                 if (!studentIds.Any())
                     return new List<User>();
+
                 var students = _context.Users
                     .Where(u => studentIds.Contains(u.UserId))
                     .ToList();
@@ -170,8 +155,8 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể tải danh sách học sinh tham gia:\n" + ex.Message,
-                    "Lỗi hệ thống", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Unable to load participants:\n" + ex.Message,
+                    "System Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new List<User>();
             }
         }
@@ -183,23 +168,23 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == requestId);
                 if (req == null)
                 {
-                    MessageBox.Show("Không tìm thấy yêu cầu.", "Thông báo");
+                    MessageBox.Show("Request not found.", "Notification");
                     return false;
                 }
 
                 if (req.Status != "pending")
                 {
-                    MessageBox.Show("Chỉ có thể thêm học sinh vào yêu cầu đang chờ duyệt.", "Cảnh báo");
+                    MessageBox.Show("Only pending requests can have participants added.", "Warning");
                     return false;
                 }
 
                 int exists = _context.RoomRequests
-    .FromSqlRaw("SELECT * FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}", requestId, studentId)
-    .Count();
+                    .FromSqlRaw("SELECT * FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}", requestId, studentId)
+                    .Count();
 
                 if (exists > 0)
                 {
-                    MessageBox.Show("Học sinh này đã có trong danh sách tham gia.", "Thông báo");
+                    MessageBox.Show("This student is already a participant.", "Notification");
                     return false;
                 }
 
@@ -213,10 +198,11 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi thêm học sinh:\n" + ex.Message, "Lỗi hệ thống");
+                MessageBox.Show("Error while adding participant:\n" + ex.Message, "System Error");
                 return false;
             }
         }
+
         public RoomRequest? GetRequestById(int requestId)
         {
             try
@@ -229,10 +215,11 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể tải chi tiết yêu cầu:\n" + ex.Message);
+                MessageBox.Show("Unable to load request details:\n" + ex.Message);
                 return null;
             }
         }
+
         public bool UpdatePurpose(int id, string newPurpose)
         {
             try
@@ -242,7 +229,7 @@ namespace UniversityClassroomBookingManagement.Repositories
 
                 if (req.Status != "pending")
                 {
-                    MessageBox.Show("Chỉ có thể chỉnh sửa yêu cầu đang chờ duyệt.", "Cảnh báo");
+                    MessageBox.Show("Only pending requests can be edited.", "Warning");
                     return false;
                 }
 
@@ -253,10 +240,11 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi cập nhật mục đích:\n" + ex.Message);
+                MessageBox.Show("Error while updating purpose:\n" + ex.Message);
                 return false;
             }
         }
+
         public bool RemoveParticipant(int requestId, int studentId)
         {
             try
@@ -269,10 +257,11 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi xóa học sinh:\n" + ex.Message);
+                MessageBox.Show("Error while removing participant:\n" + ex.Message);
                 return false;
             }
         }
+
         public bool UpdateStaffNote(int requestId, string? note)
         {
             try
@@ -288,11 +277,10 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể cập nhật phản hồi:\n" + ex.Message,
-                    "Lỗi hệ thống", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Unable to update staff note:\n" + ex.Message,
+                    "System Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
-
     }
 }
