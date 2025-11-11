@@ -207,11 +207,7 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                return _context.RoomRequests
-                    .Include(r => r.Room)
-                    .Include(r => r.Slot)
-                    .Include(r => r.Requester)
-                    .FirstOrDefault(r => r.RequestId == requestId);
+                return _context.RoomRequests.Include(r => r.Room).Include(r => r.Slot).Include(r => r.Requester).FirstOrDefault(r => r.RequestId == requestId);
             }
             catch (Exception ex)
             {
