@@ -73,7 +73,7 @@
         <!-- Bộ lọc -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,10">
             <Label Content="📅 Date:" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <DatePicker x:Name="dpDateFilter" Width="150" SelectedDateChanged="FilterChanged"/>
+            <DatePicker x:Name="dpDateFilter" Width="150" SelectedDateChanged="FilterChanged" Height="33"/>
 
             <Label Content="🏢 Building:" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,5,0"/>
             <ComboBox x:Name="cbBuildingFilter" SelectionChanged="FilterChanged" Width="150"/>
