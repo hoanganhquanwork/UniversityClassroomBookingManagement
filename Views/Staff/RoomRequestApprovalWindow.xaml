@@ -1,0 +1,126 @@
+﻿<Window x:Class="UniversityClassroomBookingManagement.Views.RoomRequestApprovalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Room Request Approval"
+        Height="620" Width="1050"
+        Background="#FFF8F8F8">
+
+    <Window.Resources>
+        <!-- Style nút -->
+        <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Width" Value="130"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF707070"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Gray" BlurRadius="8" ShadowDepth="2"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="BorderBrush" Value="#FFD0D0D0"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+
+        <!-- Style ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="#FFD0D0D0"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="📝 Room Request Approval"
+                   FontSize="26"
+                   FontWeight="Bold"
+                   Foreground="#FF3366FF"
+                   Margin="0,0,0,10"/>
+
+        <!-- Bộ lọc -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,10">
+            <Label Content="📅 Date:" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <DatePicker x:Name="dpDateFilter" Width="150" SelectedDateChanged="FilterChanged"/>
+
+            <Label Content="🏢 Building:" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,5,0"/>
+            <ComboBox x:Name="cbBuildingFilter" SelectionChanged="FilterChanged" Width="150"/>
+
+            <Label Content="⚙️ Status:" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,5,0"/>
+            <ComboBox x:Name="cbStatusFilter" Width="150" SelectionChanged="FilterChanged">
+                <ComboBoxItem Content="All"/>
+                <ComboBoxItem Content="pending"/>
+                <ComboBoxItem Content="approved"/>
+                <ComboBoxItem Content="rejected"/>
+                <ComboBoxItem Content="cancelled"/>
+            </ComboBox>
+
+            <Button Content="🔄 Refresh" Background="#FF666666" Click="BtnRefresh_Click"/>
+        </StackPanel>
+
+        <!-- Danh sách yêu cầu -->
+        <Border Grid.Row="2" CornerRadius="10" BorderBrush="#FFD0D0D0" BorderThickness="1" Background="White" Padding="10">
+            <DataGrid x:Name="dgvRequests"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      SelectionChanged="dgvRequests_SelectionChanged"
+                      AlternatingRowBackground="#FFF3F3F3"
+                      FontSize="14"
+                      RowBackground="White">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding RequestId}" Width="60"/>
+                    <DataGridTextColumn Header="Requester" Binding="{Binding Requester.FullName}" Width="150"/>
+                    <DataGridTextColumn Header="Building" Binding="{Binding Room.Building.BuildingName}" Width="130"/>
+                    <DataGridTextColumn Header="Room" Binding="{Binding Room.RoomName}" Width="100"/>
+                    <DataGridTextColumn Header="Slot" Binding="{Binding SlotId}" Width="130"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding IntendedDate}" Width="100"/>
+                    <DataGridTextColumn Header="Purpose" Binding="{Binding Purpose}" Width="180"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                    <DataGridTextColumn Header="Remark" Binding="{Binding Remark}" Width="200"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button Content="✅ Approve" Background="#FF4CAF50" Click="BtnApprove_Click"/>
+            <Button Content="❌ Reject" Background="#FFE53935" Click="BtnReject_Click"/>
+            <Button Content="🔄 Cancel Booking" Background="#FFB00020" Click="BtnCancel_Click"/>
+            <Button Content="⬅️ Back" Background="#FF777777" Click="BtnBack_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
