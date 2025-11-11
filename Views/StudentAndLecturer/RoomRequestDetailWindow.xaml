@@ -9,8 +9,7 @@
         ResizeMode="NoResize">
 
     <DockPanel>
-        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
-
+        
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="30">
                 <Grid.RowDefinitions>
