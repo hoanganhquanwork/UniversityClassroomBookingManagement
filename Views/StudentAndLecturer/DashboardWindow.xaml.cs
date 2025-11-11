@@ -169,6 +169,9 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 ShowFilteredList();
         }
 
-        private void Sidebar_Loaded(object sender, RoutedEventArgs e) { }
+        private void Sidebar_Loaded(object sender, RoutedEventArgs e) {
+
+            sidebarControl.SetCurrentUser(_currentUser);
+        }
     }
 }

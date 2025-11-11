@@ -6,9 +6,7 @@
              mc:Ignorable="d"
              d:DesignHeight="720" d:DesignWidth="230">
 
-    <!-- 🔸 STYLE SECTION -->
     <UserControl.Resources>
-        <!-- Nút radio trong sidebar -->
         <Style TargetType="RadioButton" x:Key="SidebarButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="White"/>
@@ -35,8 +33,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <!-- Icon style -->
         <Style TargetType="Path" x:Key="SidebarIcon">
             <Setter Property="Fill" Value="White"/>
             <Setter Property="Width" Value="18"/>
@@ -46,26 +42,18 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- 🔸 MAIN LAYOUT -->
     <Grid Background="#FF6600" Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Logo -->
             <RowDefinition Height="*"/>
-            <!-- Navigation -->
             <RowDefinition Height="Auto"/>
-            <!-- Footer -->
         </Grid.RowDefinitions>
-
-        <!-- 🔹 LOGO -->
         <Border Grid.Row="0" Padding="0" HorizontalAlignment="Center">
             <Image Source="pack://application:,,,/Assets/images/logo.png"
                    Width="200" Height="60"
                    Stretch="Uniform"
                    Margin="0,20,0,20"/>
         </Border>
-
-        <!-- 🔹 NAVIGATION AREA -->
         <StackPanel Grid.Row="1" Margin="10,10,0,0">
             <RadioButton x:Name="Nav_MyRequests"
                          Style="{StaticResource SidebarButton}"
@@ -99,7 +87,6 @@
             </RadioButton>
         </StackPanel>
 
-        <!-- 🔹 FOOTER AREA -->
         <StackPanel Grid.Row="1" Margin="10,457,10,78" Grid.RowSpan="2">
             <Separator Margin="0,0,0,15" Opacity="0.3"/>
             <Button x:Name="Nav_Logout"

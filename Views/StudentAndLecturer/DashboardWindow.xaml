@@ -8,8 +8,7 @@
         Background="#F8F9FA"
         ResizeMode="NoResize">
     <DockPanel Margin="0,0,0,-6">
-        <sidebar:Sidebar DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
-
+        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
         <Grid Margin="25">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -39,14 +38,14 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
                     <TextBox x:Name="txtSearch"
-         Width="300" Height="34"
-         Margin="0,0,10,0"
-         FontSize="13"
-         BorderBrush="#DDD"
-         BorderThickness="1"
-         VerticalContentAlignment="Center"
-         ToolTip="Tìm kiếm theo mục đích, phòng hoặc ghi chú"
-         TextChanged="TextBox_TextChanged"/>
+                     Width="300" Height="34"
+                     Margin="0,0,10,0"
+                     FontSize="13"
+                     BorderBrush="#DDD"
+                     BorderThickness="1"
+                     VerticalContentAlignment="Center"
+                     ToolTip="Tìm kiếm theo mục đích, phòng hoặc ghi chú"
+                     TextChanged="TextBox_TextChanged"/>    
 
                     <ComboBox x:Name="cboStatus"
           Width="160" Height="34"

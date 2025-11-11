@@ -13,14 +13,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
     public partial class UserProfileWindow : Window
     {
         private readonly UserRepository _userRepo;
-        private readonly User _currentUser;
-
+        private User _currentUser;
         public UserProfileWindow(User currentUser)
         {
             InitializeComponent();
             _userRepo = new UserRepository();
             _currentUser = currentUser;
-            Sidebar.SetCurrentUser(_currentUser);
+            sidebarControl.SetCurrentUser(_currentUser);
             LoadUserInfo();
         }
 
@@ -80,6 +79,15 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             }
         }
 
+        private bool HasUserChanged(User oldUser, User newUser)
+        {
+            return oldUser.FullName != newUser.FullName
+                || oldUser.Email != newUser.Email
+                || oldUser.Phone != newUser.Phone
+                || oldUser.Gender != newUser.Gender
+                || oldUser.DateOfBirth != newUser.DateOfBirth
+                || oldUser.ProfilePicture != newUser.ProfilePicture;
+        }
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = cbGender.SelectedItem as ComboBoxItem;
@@ -98,11 +106,19 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 ProfilePicture = _currentUser.ProfilePicture
             };
 
+            if (!HasUserChanged(_currentUser, updatedUser))
+            {
+                MessageBox.Show("Không có thông tin nào thay đổi để cập nhật.", "Thông báo",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             bool success = _userRepo.UpdateProfile(updatedUser);
             if (success)
             {
                 MessageBox.Show("Cập nhật hồ sơ thành công!", "Thành công",
                     MessageBoxButton.OK, MessageBoxImage.Information);
+                _currentUser = updatedUser;
             }
             else
             {
@@ -110,7 +126,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         private void btnChangePicture_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog

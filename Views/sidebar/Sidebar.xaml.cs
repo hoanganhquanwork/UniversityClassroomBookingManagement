@@ -64,18 +64,9 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
         }
         private void Navigate(Window newWindow)
         {
-            // Mở cửa sổ mới
+            Window? parentWindow = Window.GetWindow(this);
             newWindow.Show();
-
-            // Đóng các cửa sổ khác (trừ cái mới mở)
-            foreach (Window w in Application.Current.Windows)
-            {
-                if (w != newWindow)
-                {
-                    w.Close();
-                    break;
-                }
-            }
+            parentWindow?.Close();
         }
     }
 }

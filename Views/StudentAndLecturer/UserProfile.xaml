@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sidebar="clr-namespace:UniversityClassroomBookingManagement.Views.sidebar"
         Title="FPTU Room Booking - User Profile"
-        Height="720" Width="1180"
+        Height="768" Width="1493"
         WindowStartupLocation="CenterScreen"
         Background="#F8F9FA">
 
     <DockPanel>
-        <sidebar:Sidebar x:Name="Sidebar" DockPanel.Dock="Left"/>
+        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left"/>
 
         <Grid Background="#F8F9FA">
             <Grid Margin="40">

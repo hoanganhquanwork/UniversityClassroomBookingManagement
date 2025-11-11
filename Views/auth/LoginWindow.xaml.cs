@@ -44,6 +44,17 @@ namespace UniversityClassroomBookingManagement.Views.auth
                     dashboard.Show();
                     this.Close();
                 }
+                else if (user.Role == "Staff")
+                {
+                    //var dashboard = new Views.Staff.StaffDashboardWindow(user);
+                    //dashboard.Show();
+                    //this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Vai trò người dùng không hợp lệ.", "Lỗi",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }
