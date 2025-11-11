@@ -58,7 +58,10 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                return _context.Users.FirstOrDefault(u => u.UserId == userId);
+                return _context.Users
+                    .Include(u => u.StudentProfile)
+                    .Include(u => u.LecturerProfile)
+                    .FirstOrDefault(u => u.UserId == userId);
             }
             catch (Exception ex)
             {
@@ -235,6 +238,40 @@ namespace UniversityClassroomBookingManagement.Repositories
                 if (user == null) return false;
 
                 user.ProfilePicture = newPath;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public bool UpdateStudentProfile(StudentProfile profile)
+        {
+            try
+            {
+                var existing = _context.StudentProfiles.FirstOrDefault(s => s.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Major = profile.Major;
+                existing.Address = profile.Address;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateLecturerProfile(LecturerProfile profile)
+        {
+            try
+            {
+                var existing = _context.LecturerProfiles.FirstOrDefault(l => l.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Department = profile.Department;
                 _context.SaveChanges();
                 return true;
             }
