@@ -117,6 +117,7 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button Content="👁 View Details" Background="#FF008CBA" Click="BtnViewDetails_Click"/>
             <Button Content="✅ Approve" Background="#FF4CAF50" Click="BtnApprove_Click"/>
             <Button Content="❌ Reject" Background="#FFE53935" Click="BtnReject_Click"/>
             <Button Content="🔄 Cancel Booking" Background="#FFB00020" Click="BtnCancel_Click"/>

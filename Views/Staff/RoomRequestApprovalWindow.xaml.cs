@@ -114,5 +114,18 @@ namespace UniversityClassroomBookingManagement.Views
         {
             this.Close();
         }
+
+        private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selected == null)
+            {
+                MessageBox.Show("Please select a request to view details.");
+                return;
+            }
+
+            var detailWindow = new RoomRequestDetailWindow(_selected.RequestId);
+            detailWindow.ShowDialog();
+        }
+
     }
 }
