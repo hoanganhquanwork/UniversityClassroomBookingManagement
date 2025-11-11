@@ -12,10 +12,8 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="⏰ Time Slot Management"
-                   FontSize="26" FontWeight="Bold" Foreground="#FF3366FF"
-                   Margin="0,0,0,10"/>
+                   FontSize="26" FontWeight="Bold" Foreground="#FF3366FF"/>
 
-        <!-- DataGrid -->
         <Border Grid.Row="1" Background="White" CornerRadius="10"
                 BorderBrush="#FFD0D0D0" BorderThickness="1" Padding="10">
             <DataGrid x:Name="dgvSlots" AutoGenerateColumns="False"
@@ -24,42 +22,72 @@
                       AlternatingRowBackground="#FFF2F2F2" FontSize="14">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding SlotId}" Width="60"/>
-                    <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150"/>
-                    <DataGridTextColumn Header="End Time" Binding="{Binding EndTime}" Width="150"/>
+                    <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime, StringFormat='{}{0:HH\\:mm}'}" Width="150"/>
+                    <DataGridTextColumn Header="End Time" Binding="{Binding EndTime, StringFormat='{}{0:HH\\:mm}'}" Width="150"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
 
-        <!-- Form -->
-        <Border Grid.Row="2" Background="White" CornerRadius="10"
-                BorderBrush="#FFD0D0D0" BorderThickness="1" Padding="15" Margin="0,15,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Margin="10" Grid.Column="0">
-                    <Label Content="Start Time" FontWeight="Bold" Foreground="#444"/>
-                    <TextBox x:Name="txtStartTime" Height="30" FontSize="14" 
-                             ToolTip="Format: HH:mm (e.g. 08:00)"/>
-                </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <StackPanel Margin="10" Grid.Column="1">
-                    <Label Content="End Time" FontWeight="Bold" Foreground="#444"/>
-                    <TextBox x:Name="txtEndTime" Height="30" FontSize="14"
-                             ToolTip="Format: HH:mm (e.g. 09:30)"/>
-                </StackPanel>
+            <StackPanel Margin="0,40,0,10" Grid.Column="0" Grid.Row="0">
+                <Label Content="Slot ID" FontWeight="Bold" Foreground="#FF444444"/>
+                <TextBox x:Name="txtSlotId" Height="30" FontSize="14"/>
+            </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="10,25,0,0">
-                    <Button Content="➕ Add" Width="70" Margin="5" Background="#FF6BAA00" Click="BtnAdd_Click"/>
-                    <Button Content="✏️ Edit" Width="70" Margin="5" Background="#FF008CBA" Click="BtnEdit_Click"/>
-                    <Button Content="🗑️ Delete" Width="70" Margin="5" Background="#FFB00020" Click="BtnDelete_Click"/>
-                    <Button Content="🔄 Refresh" Width="70" Margin="5" Background="#FF666666" Click="BtnRefresh_Click"/>
-                    <Button Content="⬅️ Back" Width="70" Margin="5" Background="#FF777777" Click="BtnBack_Click"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+            <StackPanel Margin="10,40,0,10" Grid.Column="1" Grid.Row="0">
+                <Label Content="Start Time" FontWeight="Bold" Foreground="#444"/>
+                <TextBox x:Name="txtStartTime" Height="30" FontSize="14"/>
+            </StackPanel>
+
+            <StackPanel Margin="10,40,0,10" Grid.Column="2" Grid.Row="0">
+                <Label Content="End Time" FontWeight="Bold" Foreground="#444"/>
+                <TextBox x:Name="txtEndTime" Height="30" FontSize="14"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="➕ Add"
+            Width="80" Margin="5"
+            Background="#4CAF50" Foreground="White"
+            FontWeight="Bold" BorderThickness="0"
+            Cursor="Hand" Click="BtnAdd_Click"/>
+
+                <Button Content="✏️ Edit"
+            Width="80" Margin="5"
+            Background="#2196F3" Foreground="White"
+            FontWeight="Bold" BorderThickness="0"
+            Cursor="Hand" Click="BtnEdit_Click"/>
+
+                <Button Content="🗑️ Delete"
+            Width="80" Margin="5"
+            Background="#E53935" Foreground="White"
+            FontWeight="Bold" BorderThickness="0"
+            Cursor="Hand" Click="BtnDelete_Click"/>
+
+                <Button Content="🔄 Refresh"
+            Width="80" Margin="5"
+            Background="#757575" Foreground="White"
+            FontWeight="Bold" BorderThickness="0"
+            Cursor="Hand" Click="BtnRefresh_Click"/>
+
+                <Button Content="⬅️ Back"
+            Width="80" Margin="5"
+            Background="#9E9E9E" Foreground="White"
+            FontWeight="Bold" BorderThickness="0"
+            Cursor="Hand" Click="BtnBack_Click"/>
+            </StackPanel>
+
+        </Grid>
+
     </Grid>
 </Window>

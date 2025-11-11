@@ -24,18 +24,29 @@ namespace UniversityRoomBooking.Repositories
         // Add (check trùng & hợp lệ)
         public bool AddSlot(TimeSlot slot)
         {
-            if (slot == null || slot.StartTime >= slot.EndTime)
+            try
+            {
+                if (_context.TimeSlots.Any(s => s.SlotId == slot.SlotId))
+                {
+                    return false;
+                }
+
+                bool overlap = _context.TimeSlots.Any(s => slot.StartTime < s.EndTime && s.StartTime < slot.EndTime);
+                if (overlap)
+                {
+                    return false;
+                }
+
+                _context.TimeSlots.Add(slot);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
                 return false;
-
-            bool overlap = _context.TimeSlots.Any(s => slot.StartTime < s.EndTime && s.StartTime < slot.EndTime);
-
-
-            if (overlap) return false;
-
-            _context.TimeSlots.Add(slot);
-            _context.SaveChanges();
-            return true;
+            }
         }
+
 
         // Update
         public bool UpdateSlot(TimeSlot slot)

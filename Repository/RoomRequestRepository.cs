@@ -282,5 +282,120 @@ namespace UniversityClassroomBookingManagement.Repositories
                 return false;
             }
         }
+
+
+        // ============================================================
+        // STAFF
+        // ============================================================
+        
+        public List<RoomRequest> FilterRequests(DateTime date, string status, string? buildingName)
+        {
+            try
+            {
+                var query = _context.RoomRequests
+                    .Include(r => r.Room).ThenInclude(rm => rm.Building)
+                    .Include(r => r.Slot)
+                    .Include(r => r.Requester)
+                    .Where(r => r.IntendedDate == DateOnly.FromDateTime(date))
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(buildingName))
+                    query = query.Where(r => r.Room.Building.BuildingName == buildingName);
+
+                if (!string.IsNullOrWhiteSpace(status) && status != "All")
+                    query = query.Where(r => r.Status == status);
+
+                var list = query.ToList();
+                
+                return list.OrderBy(r => r.Slot.StartTime).ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading requests:\n" + ex.Message);
+                return new List<RoomRequest>();
+            }
+        }
+
+        public List<Building> GetAllBuildings()
+        {
+            return _context.Buildings.OrderBy(b => b.BuildingName).ToList();
+        }
+
+        public bool ApproveRequest(int requestId, int staffId)
+        {
+            try
+            {
+                var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == requestId);
+                if (req == null) return false;
+
+                req.Status = "approved";
+                req.ApprovedBy = staffId;
+                req.UpdatedAt = DateTime.Now;
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error approving request:\n" + ex.Message);
+                return false;
+            }
+        }
+
+        public bool RejectRequest(int requestId, int staffId, string remark)
+        {
+            try
+            {
+                var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == requestId);
+                if (req == null) return false;
+
+                req.Status = "rejected";
+                req.ApprovedBy = staffId;
+                req.Remark = remark;
+                req.UpdatedAt = DateTime.Now;
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error rejecting request:\n" + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CancelRequest(int requestId, int staffId, string remark)
+        {
+            try
+            {
+                var req = _context.RoomRequests
+                    .Include(r => r.Slot)
+                    .FirstOrDefault(r => r.RequestId == requestId);
+
+                if (req == null) return false;
+
+                req.Status = "cancelled";
+                req.ApprovedBy = staffId;
+                req.Remark = remark;
+                req.UpdatedAt = DateTime.Now;
+
+                // update booking nếu có
+                var booking = _context.Bookings.FirstOrDefault(b => b.RequestId == requestId);
+                if (booking != null)
+                {
+                    booking.Status = "cancelled";
+                }
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error cancelling booking:\n" + ex.Message);
+                return false;
+            }
+        }
+
+
     }
 }

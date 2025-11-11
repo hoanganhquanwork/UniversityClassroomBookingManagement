@@ -24,28 +24,40 @@ namespace UniversityRoomBooking.Views
             txtStartTime.Clear();
             txtEndTime.Clear();
             _selectedSlot = null;
+            txtSlotId.Clear();
         }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
+            if (!int.TryParse(txtSlotId.Text, out int slotId))
+            {
+                MessageBox.Show("⚠️ Slot ID must be a valid number (1, 2, 3...).");
+                return;
+            }
             if (!TimeOnly.TryParse(txtStartTime.Text, out TimeOnly start) ||
                 !TimeOnly.TryParse(txtEndTime.Text, out TimeOnly end))
             {
-                MessageBox.Show("Please enter valid time format (HH:mm).");
+                MessageBox.Show("⚠️ Please enter valid time format (HH:mm).");
+                return;
+            }
+            if (start >= end)
+            {
+                MessageBox.Show("⚠️ Start time must be earlier than end time.");
                 return;
             }
 
-            TimeSlot slot = new TimeSlot { StartTime = start, EndTime = end };
+            TimeSlot slot = new TimeSlot { SlotId = slotId, StartTime = start, EndTime = end };
             if (_repo.AddSlot(slot))
             {
-                MessageBox.Show("✅ Added successfully!");
+                MessageBox.Show("✅ Added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadData();
             }
             else
             {
-                MessageBox.Show("⚠️ Invalid or overlapping time slot!");
+                MessageBox.Show("⚠️ Invalid or overlapping time slot!", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
@@ -112,8 +124,9 @@ namespace UniversityRoomBooking.Views
             if (dgvSlots.SelectedItem is TimeSlot selected)
             {
                 _selectedSlot = selected;
-                txtStartTime.Text = selected.StartTime.ToString(@"hh\:mm");
-                txtEndTime.Text = selected.EndTime.ToString(@"hh\:mm");
+                txtSlotId.Text = selected.SlotId.ToString();
+                txtStartTime.Text = selected.StartTime.ToString(@"HH\:mm");
+                txtEndTime.Text = selected.EndTime.ToString(@"HH\:mm");
             }
         }
     }
