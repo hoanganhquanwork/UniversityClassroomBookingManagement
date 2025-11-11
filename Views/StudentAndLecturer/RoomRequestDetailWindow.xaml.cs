@@ -266,10 +266,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
 
-        private void Sidebar_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (_currentUser != null)
-                sidebarControl.SetCurrentUser(_currentUser);
-        }
+
     }
 }

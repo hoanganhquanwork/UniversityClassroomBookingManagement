@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows;
-using Microsoft.EntityFrameworkCore;
 using UniversityClassroomBookingManagement.Models;
 
 namespace UniversityClassroomBookingManagement.Repositories
@@ -280,5 +282,40 @@ namespace UniversityClassroomBookingManagement.Repositories
                 return false;
             }
         }
+        public StaffProfile? GetStaffProfileByUserId(int userId)
+        {
+            return _context.StaffProfiles.FirstOrDefault(s => s.UserId == userId);
+        }
+
+        public bool UpdateStaffProfile(StaffProfile staff)
+        {
+            var existing = _context.StaffProfiles.FirstOrDefault(s => s.UserId == staff.UserId);
+            if (existing == null)
+            {
+                _context.StaffProfiles.Add(staff);
+            }
+            else
+            {
+                existing.Position = staff.Position;
+            }
+            return _context.SaveChanges() > 0;
+        }
+        public bool VerifyPassword(int userId, string password)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+            if (user == null) return false;
+            return user.PasswordHash == password;
+        }
+
+        public bool UpdatePassword(int userId, string newPassword)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+            if (user == null) return false;
+
+            user.PasswordHash = newPassword;
+            return _context.SaveChanges() > 0;
+        }
+
+
     }
 }

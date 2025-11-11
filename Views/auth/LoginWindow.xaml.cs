@@ -2,6 +2,7 @@
 using System.Windows;
 using UniversityClassroomBookingManagement.Models;
 using UniversityClassroomBookingManagement.Repositories;
+using UniversityClassroomBookingManagement.Views.Dashboard;
 
 namespace UniversityClassroomBookingManagement.Views.auth
 {
@@ -34,9 +35,9 @@ namespace UniversityClassroomBookingManagement.Views.auth
                 }
                 else if (user.Role == "Staff")
                 {
-                    // var dashboard = new Views.Staff.StaffDashboardWindow(user);
-                    // dashboard.Show();
-                    // this.Close();
+                    StaffDashboardWindow staffDashboard = new StaffDashboardWindow(user);
+                    staffDashboard.Show();
+                    this.Close();
                 }
                 else
                 {

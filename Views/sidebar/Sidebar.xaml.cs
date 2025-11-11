@@ -68,5 +68,14 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
             newWindow.Show();
             parentWindow?.Close();
         }
+
+        private void ChangePassword_Click(object sender, RoutedEventArgs e)
+        {
+         
+            var pwdWindow = new ChangePasswordWindow(_currentUser);
+            pwdWindow.ShowDialog();
+        }
+
     }
 }
+

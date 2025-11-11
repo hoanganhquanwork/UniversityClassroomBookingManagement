@@ -1,7 +1,6 @@
 ﻿<Window x:Class="UniversityClassroomBookingManagement.Views.StudentAndLecturer.RoomRequestDetailWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sidebar="clr-namespace:UniversityClassroomBookingManagement.Views.sidebar"
         Title="FPTU Room Booking - Request Detail"
         Height="768" Width="1450"
         WindowStartupLocation="CenterScreen"
@@ -9,7 +8,6 @@
         ResizeMode="NoResize">
 
     <DockPanel>
-        <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="30">

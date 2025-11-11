@@ -86,7 +86,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             var selected = dgRequests.SelectedItem as dynamic;
             int id = selected.ID;
 
-            Hide();
             var w = new RoomRequestDetailWindow(id, _currentUser, false);
             w.Closed += (s, e2) =>
             {
@@ -107,7 +106,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             var selected = dgRequests.SelectedItem as dynamic;
             int id = selected.ID;
 
-            Hide();
             var w = new RoomRequestDetailWindow(id, _currentUser, true);
             w.Closed += (s, e2) =>
             {
