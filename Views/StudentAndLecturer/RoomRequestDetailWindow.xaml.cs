@@ -30,18 +30,18 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             _request = _repo.GetRequestById(_requestId);
             if (_request == null)
             {
-                MessageBox.Show("Không tìm thấy yêu cầu!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Request not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
             }
 
             txtRequestId.Text = _request.RequestId.ToString();
-            txtRoom.Text = _request.Room?.RoomName ?? "(Không xác định)";
+            txtRoom.Text = _request.Room?.RoomName ?? "(Unknown)";
             txtDate.Text = _request.IntendedDate.ToString("dd/MM/yyyy");
-            txtSlot.Text = $"Ca {_request.SlotId}";
+            txtSlot.Text = $"Slot {_request.SlotId}";
             txtStatus.Text = MapStatus(_request.Status);
             txtPurpose.Text = _request.Purpose ?? "";
-            txtStaffNote.Text = _request.Note ?? "(Chưa có phản hồi)";
+            txtStaffNote.Text = _request.Note ?? "(No feedback yet)";
 
             if (_request.Requester?.Role == "Student")
             {
@@ -57,7 +57,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void ApplyMode()
         {
-            lblMode.Text = _isEditMode ? "  |  Chỉnh sửa yêu cầu" : "  |  Xem thông tin yêu cầu";
+            lblMode.Text = _isEditMode ? "  |  Edit Request" : "  |  View Request Information";
             lblMode.Foreground = new SolidColorBrush(_isEditMode
                 ? Color.FromRgb(255, 102, 0)
                 : Color.FromRgb(136, 136, 136));
@@ -85,19 +85,19 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
             if (_request.Requester?.Role != "Student")
             {
-                MessageBox.Show("Chỉ sinh viên mới được chỉnh sửa yêu cầu!", "Cảnh báo");
+                MessageBox.Show("Only students can edit requests!", "Warning");
                 return;
             }
 
             if (_request.Status != "pending")
             {
-                MessageBox.Show("Chỉ có thể chỉnh sửa yêu cầu đang chờ duyệt!", "Cảnh báo");
+                MessageBox.Show("Only pending requests can be modified!", "Warning");
                 return;
             }
 
             if (_repo.UpdatePurpose(_requestId, newPurpose))
             {
-                MessageBox.Show("Đã lưu thay đổi thành công!", "Thành công");
+                MessageBox.Show("Changes saved successfully!", "Success");
                 Close();
             }
         }
@@ -113,16 +113,16 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (lstParticipants.SelectedItem is not User selected)
             {
-                MessageBox.Show("Vui lòng chọn sinh viên để xóa.");
+                MessageBox.Show("Please select a student to remove.", "Notification");
                 return;
             }
 
-            if (MessageBox.Show($"Bạn có chắc muốn xóa {selected.FullName} khỏi danh sách?",
-                "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Are you sure you want to remove {selected.FullName} from the list?",
+                "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 if (_repo.RemoveParticipant(_requestId, selected.UserId))
                 {
-                    MessageBox.Show("Đã xóa sinh viên khỏi danh sách.", "Thành công");
+                    MessageBox.Show("Student removed from the list successfully.", "Success");
                     LoadData();
                 }
             }
@@ -130,14 +130,15 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private string MapStatus(string? status)
         {
-            if (status == "pending") return "Đang chờ duyệt";
-            if (status == "approved") return "Đã duyệt";
-            if (status == "rejected") return "Từ chối";
-            if (status == "cancelled") return "Đã hủy";
-            return "(Không xác định)";
+            if (status == "pending") return "Pending";
+            if (status == "approved") return "Approved";
+            if (status == "rejected") return "Rejected";
+            if (status == "cancelled") return "Cancelled";
+            return "(Unknown)";
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
+
         private void Sidebar_Loaded(object sender, RoutedEventArgs e) { }
     }
 }

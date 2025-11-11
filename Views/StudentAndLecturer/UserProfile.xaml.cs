@@ -14,6 +14,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
     {
         private readonly UserRepository _userRepo;
         private User _currentUser;
+
         public UserProfileWindow(User currentUser)
         {
             InitializeComponent();
@@ -28,7 +29,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             var user = _userRepo.GetUserById(_currentUser.UserId);
             if (user == null)
             {
-                MessageBox.Show("Không thể tải thông tin người dùng.", "Lỗi",
+                MessageBox.Show("Unable to load user information.", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
@@ -51,6 +52,20 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             }
 
             LoadProfileImage(user.ProfilePicture);
+            studentPanel.Visibility = Visibility.Collapsed;
+            lecturerPanel.Visibility = Visibility.Collapsed;
+
+            if (user.Role == "Student" && user.StudentProfile != null)
+            {
+                studentPanel.Visibility = Visibility.Visible;
+                txtMajor.Text = user.StudentProfile.Major;
+                txtAddress.Text = user.StudentProfile.Address;
+            }
+            else if (user.Role == "Lecturer" && user.LecturerProfile != null)
+            {
+                lecturerPanel.Visibility = Visibility.Visible;
+                txtDepartment.Text = user.LecturerProfile.Department;
+            }
         }
 
         private void LoadProfileImage(string? relativePath)
@@ -88,6 +103,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 || oldUser.DateOfBirth != newUser.DateOfBirth
                 || oldUser.ProfilePicture != newUser.ProfilePicture;
         }
+
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = cbGender.SelectedItem as ComboBoxItem;
@@ -105,33 +121,63 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     : null,
                 ProfilePicture = _currentUser.ProfilePicture
             };
-
-            if (!HasUserChanged(_currentUser, updatedUser))
+            if (_currentUser.Role == "Student")
             {
-                MessageBox.Show("Không có thông tin nào thay đổi để cập nhật.", "Thông báo",
+                updatedUser.StudentProfile = new StudentProfile
+                {
+                    UserId = _currentUser.UserId,
+                    Major = txtMajor.Text.Trim(),
+                    Address = txtAddress.Text.Trim()
+                };
+            }
+            else if (_currentUser.Role == "Lecturer")
+            {
+                updatedUser.LecturerProfile = new LecturerProfile
+                {
+                    UserId = _currentUser.UserId,
+                    Department = txtDepartment.Text.Trim()
+                };
+            }
+            bool isChanged = HasUserChanged(_currentUser, updatedUser)
+                             || (_currentUser.Role == "Student" && (
+                                 _currentUser.StudentProfile?.Major != updatedUser.StudentProfile?.Major ||
+                                 _currentUser.StudentProfile?.Address != updatedUser.StudentProfile?.Address))
+                             || (_currentUser.Role == "Lecturer" && (
+                                 _currentUser.LecturerProfile?.Department != updatedUser.LecturerProfile?.Department));
+
+            if (!isChanged)
+            {
+                MessageBox.Show("No information has been changed to update.", "Information",
                     MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
             bool success = _userRepo.UpdateProfile(updatedUser);
+
             if (success)
             {
-                MessageBox.Show("Cập nhật hồ sơ thành công!", "Thành công",
+                if (_currentUser.Role == "Student" && updatedUser.StudentProfile != null)
+                    _userRepo.UpdateStudentProfile(updatedUser.StudentProfile);
+                else if (_currentUser.Role == "Lecturer" && updatedUser.LecturerProfile != null)
+                    _userRepo.UpdateLecturerProfile(updatedUser.LecturerProfile);
+
+                MessageBox.Show("Profile updated successfully!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
-                _currentUser = updatedUser;
+                _currentUser = updatedUser; 
             }
             else
             {
-                MessageBox.Show("Không thể cập nhật hồ sơ.", "Lỗi",
+                MessageBox.Show("Failed to update profile.", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private void btnChangePicture_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
             {
-                Title = "Chọn ảnh đại diện",
-                Filter = "Ảnh (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg",
+                Title = "Select Profile Picture",
+                Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg",
                 Multiselect = false
             };
 
@@ -157,18 +203,18 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 if (updated)
                 {
                     LoadProfileImage(relativePath);
-                    MessageBox.Show("Ảnh đại diện đã được cập nhật!", "Thành công",
+                    MessageBox.Show("Profile picture has been updated successfully!", "Success",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show("Không thể cập nhật ảnh trong cơ sở dữ liệu.", "Lỗi",
+                    MessageBox.Show("Unable to update the picture in the database.", "Error",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Đã xảy ra lỗi khi đổi ảnh:\n" + ex.Message, "Lỗi",
+                MessageBox.Show("An error occurred while changing the picture:\n" + ex.Message, "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

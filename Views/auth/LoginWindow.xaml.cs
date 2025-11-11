@@ -1,24 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using UniversityClassroomBookingManagement.Models;
 using UniversityClassroomBookingManagement.Repositories;
 
 namespace UniversityClassroomBookingManagement.Views.auth
 {
-    /// <summary>
-    /// Interaction logic for LoginWindow.xaml
-    /// </summary>
     public partial class LoginWindow : Window
     {
         private readonly UserRepository _userRepo = new UserRepository();
@@ -27,6 +13,7 @@ namespace UniversityClassroomBookingManagement.Views.auth
         {
             InitializeComponent();
         }
+
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
             string username = txtUsername.Text.Trim();
@@ -36,8 +23,9 @@ namespace UniversityClassroomBookingManagement.Views.auth
 
             if (user != null)
             {
-                MessageBox.Show($"Chào mừng {user.FullName} ({user.Role})!", "Đăng nhập thành công",
+                MessageBox.Show($"Welcome {user.FullName} ({user.Role})!", "Login Successful",
                     MessageBoxButton.OK, MessageBoxImage.Information);
+
                 if (user.Role == "Student" || user.Role == "Lecturer")
                 {
                     var dashboard = new Views.StudentAndLecturer.DashboardWindow(user);
@@ -46,13 +34,13 @@ namespace UniversityClassroomBookingManagement.Views.auth
                 }
                 else if (user.Role == "Staff")
                 {
-                    //var dashboard = new Views.Staff.StaffDashboardWindow(user);
-                    //dashboard.Show();
-                    //this.Close();
+                    // var dashboard = new Views.Staff.StaffDashboardWindow(user);
+                    // dashboard.Show();
+                    // this.Close();
                 }
                 else
                 {
-                    MessageBox.Show("Vai trò người dùng không hợp lệ.", "Lỗi",
+                    MessageBox.Show("Invalid user role.", "Error",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }

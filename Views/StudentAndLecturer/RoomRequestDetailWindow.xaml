@@ -9,10 +9,8 @@
         ResizeMode="NoResize">
 
     <DockPanel>
-        <!-- Sidebar tái sử dụng -->
         <sidebar:Sidebar DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
 
-        <!-- Nội dung chính -->
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="30">
                 <Grid.RowDefinitions>
@@ -21,62 +19,54 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Tiêu đề -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,25">
-                    <TextBlock Text="Chi tiết yêu cầu"
+                    <TextBlock Text="Request Details"
                                FontSize="28"
                                FontWeight="Bold"
                                Foreground="#333333"/>
                     <TextBlock x:Name="lblMode"
-                               Text="  |  Xem thông tin yêu cầu"
+                               Text="  |  View Request Information"
                                FontSize="16"
                                Foreground="#888"
                                VerticalAlignment="Bottom"
                                Margin="6,0,0,4"/>
                 </StackPanel>
 
-                <!-- Thông tin yêu cầu -->
                 <Border Grid.Row="1"
                         Background="White"
                         CornerRadius="12"
                         BorderBrush="#E0E0E0"
                         BorderThickness="1"
                         Padding="30">
-                    <StackPanel Margin="10" >
+                    <StackPanel Margin="10">
 
-                        <!-- Mã yêu cầu -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="Mã yêu cầu:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Request ID:" Width="180" FontWeight="Bold"/>
                             <TextBlock x:Name="txtRequestId"/>
                         </StackPanel>
 
-                        <!-- Phòng -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="Phòng:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Room:" Width="180" FontWeight="Bold"/>
                             <TextBlock x:Name="txtRoom"/>
                         </StackPanel>
 
-                        <!-- Ngày sử dụng -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="Ngày sử dụng:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Date of Use:" Width="180" FontWeight="Bold"/>
                             <TextBlock x:Name="txtDate"/>
                         </StackPanel>
 
-                        <!-- Khung giờ -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="Khung giờ:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Time Slot:" Width="180" FontWeight="Bold"/>
                             <TextBlock x:Name="txtSlot"/>
                         </StackPanel>
 
-                        <!-- Trạng thái -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Text="Trạng thái:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Status:" Width="180" FontWeight="Bold"/>
                             <TextBlock x:Name="txtStatus"/>
                         </StackPanel>
 
-                        <!-- Phản hồi từ Staff -->
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                            <TextBlock Text="Phản hồi từ nhân viên:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Staff Feedback:" Width="180" FontWeight="Bold"/>
                             <TextBox x:Name="txtStaffNote"
                                      Width="600"
                                      Height="80"
@@ -90,9 +80,8 @@
                                      IsReadOnly="True"/>
                         </StackPanel>
 
-                        <!-- Mục đích -->
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="Mục đích:" Width="180" FontWeight="Bold"/>
+                            <TextBlock Text="Purpose:" Width="180" FontWeight="Bold"/>
                             <TextBox x:Name="txtPurpose"
                                      Width="600"
                                      Height="80"
@@ -105,9 +94,8 @@
                                      AcceptsReturn="True"/>
                         </StackPanel>
 
-                        <!-- Danh sách sinh viên -->
                         <GroupBox x:Name="grpParticipants"
-                                  Header="Danh sách sinh viên tham gia"
+                                  Header="List of Participating Students"
                                   Margin="0,40,0,0"
                                   FontWeight="SemiBold"
                                   BorderBrush="#DDD">
@@ -121,7 +109,7 @@
                                             HorizontalAlignment="Right"
                                             Margin="0,10,0,0">
                                     <Button x:Name="btnAdd"
-                                            Content="➕ Thêm"
+                                            Content="➕ Add"
                                             Width="100" Height="34"
                                             Background="#E5F4FF"
                                             BorderBrush="#CCE8FF"
@@ -129,7 +117,7 @@
                                             Cursor="Hand"
                                             Click="BtnAddParticipant_Click"/>
                                     <Button x:Name="btnRemove"
-                                            Content="➖ Xóa"
+                                            Content="➖ Remove"
                                             Width="100" Height="34"
                                             Background="#FFE5E5"
                                             BorderBrush="#F5C2C2"
@@ -147,7 +135,7 @@
                             HorizontalAlignment="Right"
                             Margin="0,25,0,0">
                     <Button x:Name="btnSave"
-                            Content="💾 Lưu thay đổi"
+                            Content="💾 Save Changes"
                             Width="150" Height="40"
                             Background="#FF6600"
                             Foreground="White"
@@ -155,7 +143,7 @@
                             BorderBrush="#FF6600"
                             Cursor="Hand"
                             Click="BtnSave_Click"/>
-                    <Button Content="✖ Đóng"
+                    <Button Content="✖ Close"
                             Width="110" Height="40"
                             Background="#E0E0E0"
                             Foreground="#333"

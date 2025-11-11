@@ -16,16 +16,13 @@ namespace UniversityClassroomBookingManagement.Repositories
             _context = new UniversityRoomBookingContext();
         }
 
-        // ============================================================
-        // 🔹 AUTHENTICATION - LOGIN
-        // ============================================================
         public User? Login(string username, string password)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 {
-                    MessageBox.Show("Vui lòng nhập đầy đủ thông tin đăng nhập.", "Thiếu thông tin",
+                    MessageBox.Show("Please enter both username and password.", "Missing Information",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                     return null;
                 }
@@ -35,14 +32,14 @@ namespace UniversityClassroomBookingManagement.Repositories
 
                 if (user == null)
                 {
-                    MessageBox.Show("Tài khoản hoặc mật khẩu không chính xác.", "Đăng nhập thất bại",
+                    MessageBox.Show("Incorrect username or password.", "Login Failed",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
 
                 if (user.Status == "deactivated")
                 {
-                    MessageBox.Show("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.", "Cảnh báo",
+                    MessageBox.Show("Your account has been deactivated. Please contact the administrator.", "Warning",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                     return null;
                 }
@@ -51,24 +48,24 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Đã xảy ra lỗi khi đăng nhập:\n" + ex.Message, "Lỗi hệ thống",
+                MessageBox.Show("An error occurred while logging in:\n" + ex.Message, "System Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
         }
 
-        // ============================================================
-        // 🔹 USER PROFILE (STUDENT / LECTURER / STAFF)
-        // ============================================================
         public User? GetUserById(int userId)
         {
             try
             {
-                return _context.Users.FirstOrDefault(u => u.UserId == userId);
+                return _context.Users
+                    .Include(u => u.StudentProfile)
+                    .Include(u => u.LecturerProfile)
+                    .FirstOrDefault(u => u.UserId == userId);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể tải thông tin người dùng:\n" + ex.Message, "Lỗi",
+                MessageBox.Show("Unable to load user information:\n" + ex.Message, "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
@@ -81,7 +78,7 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var existing = _context.Users.FirstOrDefault(u => u.UserId == updatedUser.UserId);
                 if (existing == null)
                 {
-                    MessageBox.Show("Không tìm thấy người dùng.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("User not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
 
@@ -93,13 +90,13 @@ namespace UniversityClassroomBookingManagement.Repositories
                 existing.ProfilePicture = updatedUser.ProfilePicture;
 
                 _context.SaveChanges();
-                MessageBox.Show("Cập nhật thông tin thành công.", "Thành công",
+                MessageBox.Show("Profile updated successfully.", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cập nhật thất bại:\n" + ex.Message, "Lỗi hệ thống",
+                MessageBox.Show("Profile update failed:\n" + ex.Message, "System Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
@@ -241,6 +238,40 @@ namespace UniversityClassroomBookingManagement.Repositories
                 if (user == null) return false;
 
                 user.ProfilePicture = newPath;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public bool UpdateStudentProfile(StudentProfile profile)
+        {
+            try
+            {
+                var existing = _context.StudentProfiles.FirstOrDefault(s => s.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Major = profile.Major;
+                existing.Address = profile.Address;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateLecturerProfile(LecturerProfile profile)
+        {
+            try
+            {
+                var existing = _context.LecturerProfiles.FirstOrDefault(l => l.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Department = profile.Department;
                 _context.SaveChanges();
                 return true;
             }

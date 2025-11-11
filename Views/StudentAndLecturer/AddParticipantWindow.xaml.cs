@@ -34,7 +34,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             }
             catch
             {
-                MessageBox.Show("Không thể tải danh sách sinh viên!", "Lỗi hệ thống",
+                MessageBox.Show("Unable to load the student list!", "System Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 _students = new List<User>();
             }
@@ -66,13 +66,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (lstSuggestions.SelectedItem is not User selected) return;
 
-            if (MessageBox.Show($"Bạn có chắc muốn thêm {selected.FullName} vào yêu cầu này?",
-                "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Are you sure you want to add {selected.FullName} to this request?",
+                "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 bool success = _reqRepo.AddParticipant(_requestId, selected.UserId);
                 if (success)
                 {
-                    MessageBox.Show($"Đã thêm {selected.FullName} thành công!", "Thành công",
+                    MessageBox.Show($"{selected.FullName} has been successfully added!", "Success",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                     Close();
                 }

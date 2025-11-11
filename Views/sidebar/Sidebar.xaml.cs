@@ -20,7 +20,7 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
         {
             if (Window.GetWindow(this) == null)
             {
-                MessageBox.Show("Sidebar chưa gắn vào cửa sổ chính!");
+                MessageBox.Show("Sidebar is not attached to the main window!");
             }
         }
 
@@ -28,7 +28,6 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
         {
             _currentUser = user;
         }
-
 
         private void Nav_MyRequests_Click(object sender, RoutedEventArgs e)
         {
@@ -39,9 +38,9 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
 
         private void Nav_BookRoom_Click(object sender, RoutedEventArgs e)
         {
-            //if (_currentUser == null) return;
-            //var win = new StudentAndLecturer.BookRoomWindow(_currentUser);
-            //Navigate(win);
+            // if (_currentUser == null) return;
+            // var win = new StudentAndLecturer.BookRoomWindow(_currentUser);
+            // Navigate(win);
         }
 
         private void Nav_Profile_Click(object sender, RoutedEventArgs e)
@@ -53,8 +52,8 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
 
         private void Nav_Logout_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?",
-                                "Xác nhận đăng xuất",
+            if (MessageBox.Show("Are you sure you want to log out?",
+                                "Confirm Logout",
                                 MessageBoxButton.YesNo,
                                 MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
@@ -62,6 +61,7 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
                 Navigate(login);
             }
         }
+
         private void Navigate(Window newWindow)
         {
             Window? parentWindow = Window.GetWindow(this);
