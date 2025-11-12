@@ -106,6 +106,101 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            {
+                MessageBox.Show("⚠️ Please enter your full name.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtFullName.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                MessageBox.Show("⚠️ Please enter your email address.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtEmail.Focus();
+                return;
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtEmail.Text.Trim(),
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                MessageBox.Show("⚠️ Invalid email format.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtEmail.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPhone.Text))
+            {
+                MessageBox.Show("⚠️ Please enter phone number.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPhone.Focus();
+                return;
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtPhone.Text.Trim(), @"^[0-9]{9,11}$"))
+            {
+                MessageBox.Show("⚠️ Phone number must be 9–11 digits.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPhone.Focus();
+                return;
+            }
+
+            if (cbGender.SelectedItem == null)
+            {
+                MessageBox.Show("⚠️ Please select gender.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                cbGender.Focus();
+                return;
+            }
+
+            if (!dpDateOfBirth.SelectedDate.HasValue)
+            {
+                MessageBox.Show("⚠️ Please select date of birth.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                dpDateOfBirth.Focus();
+                return;
+            }
+
+            // Kiểm tra tuổi tối thiểu 18
+            if (dpDateOfBirth.SelectedDate.Value > DateTime.Now.AddYears(-18))
+            {
+                MessageBox.Show("⚠️ You must be at least 18 years old.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                dpDateOfBirth.Focus();
+                return;
+            }
+
+            // Kiểm tra trường riêng theo role
+            if (_currentUser.Role == "Student")
+            {
+                if (string.IsNullOrWhiteSpace(txtMajor.Text))
+                {
+                    MessageBox.Show("⚠️ Please enter your major.", "Validation Error",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    txtMajor.Focus();
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(txtAddress.Text))
+                {
+                    MessageBox.Show("⚠️ Please enter your address.", "Validation Error",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    txtAddress.Focus();
+                    return;
+                }
+            }
+            else if (_currentUser.Role == "Lecturer")
+            {
+                if (string.IsNullOrWhiteSpace(txtDepartment.Text))
+                {
+                    MessageBox.Show("⚠️ Please enter your department.", "Validation Error",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    txtDepartment.Focus();
+                    return;
+                }
+            }
+
             var selectedItem = cbGender.SelectedItem as ComboBoxItem;
             string genderValue = selectedItem?.Tag?.ToString();
 
@@ -116,11 +211,10 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 Email = txtEmail.Text.Trim(),
                 Phone = txtPhone.Text.Trim(),
                 Gender = genderValue,
-                DateOfBirth = dpDateOfBirth.SelectedDate.HasValue
-                    ? DateOnly.FromDateTime(dpDateOfBirth.SelectedDate.Value)
-                    : null,
+                DateOfBirth = DateOnly.FromDateTime(dpDateOfBirth.SelectedDate.Value),
                 ProfilePicture = _currentUser.ProfilePicture
             };
+
             if (_currentUser.Role == "Student")
             {
                 updatedUser.StudentProfile = new StudentProfile
@@ -138,6 +232,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     Department = txtDepartment.Text.Trim()
                 };
             }
+
             bool isChanged = HasUserChanged(_currentUser, updatedUser)
                              || (_currentUser.Role == "Student" && (
                                  _currentUser.StudentProfile?.Major != updatedUser.StudentProfile?.Major ||
@@ -163,7 +258,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
                 MessageBox.Show("Profile updated successfully!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
-                _currentUser = updatedUser; 
+
+                _currentUser = updatedUser;
             }
             else
             {
@@ -171,6 +267,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private void btnChangePicture_Click(object sender, RoutedEventArgs e)
         {

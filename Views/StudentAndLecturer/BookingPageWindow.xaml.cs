@@ -22,6 +22,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             _context = new UniversityRoomBookingContext();
             _currentUser = currentUser;
             LoadRoomSlots();
+            DashboardWindow dashboard = new DashboardWindow(_currentUser);
+            dashboard.Close();
         }
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
@@ -31,7 +33,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void LoadRoomSlots()
         {
-            var rooms = _roomRepo.GetAllRooms();
+            var rooms = _roomRepo.GetAllRooms().Where(r => r.Status == "available").ToList();
             var slots = _context.TimeSlots.OrderBy(s => s.StartTime).ToList();
             var selectedDate = datePicker.SelectedDate ?? DateTime.Today;
 
@@ -171,6 +173,9 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             {
                 LoadRoomSlots();
             }
+            DashboardWindow dashboard = new DashboardWindow(_currentUser);
+            dashboard.Show();
+            this.Close();
         }
     }
 }

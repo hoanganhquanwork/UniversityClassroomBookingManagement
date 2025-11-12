@@ -68,12 +68,12 @@ namespace UniversityClassroomBookingManagement.Views
         private void BtnApprove_Click(object sender, RoutedEventArgs e)
         {
             if (_selected == null) { MessageBox.Show("Please select a request."); return; }
-            if (IsPast(_selected)) { MessageBox.Show("⏰ This request time has passed."); return; }
+            if (IsPast(_selected)) { MessageBox.Show("This request time has passed."); return; }
             if (_selected.Status != "pending") { MessageBox.Show("Already processed."); return; }
 
             if (_repo.ApproveRequest(_selected.RequestId, 1))
             {
-                MessageBox.Show("✅ Approved successfully!");
+                MessageBox.Show("Approved successfully!");
                 LoadData();
             }
         }
@@ -81,15 +81,22 @@ namespace UniversityClassroomBookingManagement.Views
         private void BtnReject_Click(object sender, RoutedEventArgs e)
         {
             if (_selected == null) return;
-            if (IsPast(_selected)) { MessageBox.Show("⏰ Cannot reject past requests."); return; }
-            if (_selected.Status != "pending") return;
-
+            if (IsPast(_selected)) { MessageBox.Show("Cannot reject past requests."); return; }
+            if (_selected.Status != "pending")
+            {
+                MessageBox.Show("Only pending requests can be rejected.");
+                return;
+            }
             string remark = Interaction.InputBox("Enter rejection reason:", "Reject Request");
-            if (string.IsNullOrWhiteSpace(remark)) return;
+            if (string.IsNullOrWhiteSpace(remark))
+            {
+                MessageBox.Show("Rejection reason is required.");
+                return;
+            }
 
             if (_repo.RejectRequest(_selected.RequestId, 1, remark))
             {
-                MessageBox.Show("❌ Request rejected!");
+                MessageBox.Show("Request rejected!");
                 LoadData();
             }
         }
@@ -97,15 +104,19 @@ namespace UniversityClassroomBookingManagement.Views
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             if (_selected == null) return;
-            if (IsPast(_selected)) { MessageBox.Show("⏰ Cannot cancel past bookings."); return; }
+            if (IsPast(_selected)) { MessageBox.Show("Cannot cancel past bookings."); return; }
             if (_selected.Status != "approved") { MessageBox.Show("Only approved requests can be cancelled."); return; }
 
             string remark = Interaction.InputBox("Enter cancellation reason:", "Cancel Booking");
-            if (string.IsNullOrWhiteSpace(remark)) return;
+            if (string.IsNullOrWhiteSpace(remark)) 
+            {
+                MessageBox.Show("Cancellation reason is required.");
+                return;
+            }
 
             if (_repo.CancelRequest(_selected.RequestId, 1, remark))
             {
-                MessageBox.Show("🔄 Booking cancelled successfully!");
+                MessageBox.Show("Booking cancelled successfully!");
                 LoadData();
             }
         }
