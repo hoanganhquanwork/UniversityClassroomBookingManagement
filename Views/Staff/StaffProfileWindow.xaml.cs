@@ -86,6 +86,84 @@ namespace UniversityClassroomBookingManagement.Views.Staff
             var selectedItem = cbGender.SelectedItem as ComboBoxItem;
             string genderValue = selectedItem?.Tag?.ToString();
 
+            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            {
+                MessageBox.Show("⚠️ Please enter full name.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtFullName.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                MessageBox.Show("⚠️ Please enter email.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtEmail.Focus();
+                return;
+            }
+
+            // Kiểm tra định dạng email
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtEmail.Text.Trim(),
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                MessageBox.Show("⚠️ Invalid email format.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtEmail.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPhone.Text))
+            {
+                MessageBox.Show("⚠️ Please enter phone number.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPhone.Focus();
+                return;
+            }
+
+            // Kiểm tra định dạng số điện thoại (VD: 10 số, chỉ số)
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtPhone.Text.Trim(),
+                @"^[0-9]{9,11}$"))
+            {
+                MessageBox.Show("⚠️ Phone number must be 9–11 digits.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPhone.Focus();
+                return;
+            }
+
+            if (genderValue == null)
+            {
+                MessageBox.Show("⚠️ Please select gender.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                cbGender.Focus();
+                return;
+            }
+
+            if (!dpDateOfBirth.SelectedDate.HasValue)
+            {
+                MessageBox.Show("⚠️ Please select date of birth.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                dpDateOfBirth.Focus();
+                return;
+            }
+
+            // Kiểm tra tuổi tối thiểu (VD: >=18 tuổi)
+            var dob = dpDateOfBirth.SelectedDate.Value;
+            if (dob > DateTime.Now.AddYears(-18))
+            {
+                MessageBox.Show("⚠️ Staff must be at least 18 years old.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                dpDateOfBirth.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPosition.Text))
+            {
+                MessageBox.Show("⚠️ Please enter position.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPosition.Focus();
+                return;
+            }
+
             var updatedUser = new User
             {
                 UserId = _currentUser.UserId,
@@ -93,9 +171,7 @@ namespace UniversityClassroomBookingManagement.Views.Staff
                 Email = txtEmail.Text.Trim(),
                 Phone = txtPhone.Text.Trim(),
                 Gender = genderValue,
-                DateOfBirth = dpDateOfBirth.SelectedDate.HasValue
-                    ? DateOnly.FromDateTime(dpDateOfBirth.SelectedDate.Value)
-                    : null,
+                DateOfBirth = DateOnly.FromDateTime(dpDateOfBirth.SelectedDate.Value),
                 ProfilePicture = _currentUser.ProfilePicture
             };
 
@@ -108,16 +184,17 @@ namespace UniversityClassroomBookingManagement.Views.Staff
 
             if (userUpdated && staffUpdated)
             {
-                MessageBox.Show("Staff profile updated successfully!", "Success",
+                MessageBox.Show("✅ Staff profile updated successfully!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
                 _currentUser = updatedUser;
             }
             else
             {
-                MessageBox.Show("Failed to update profile.", "Error",
+                MessageBox.Show("❌ Failed to update profile. Please try again.", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private void btnChangePicture_Click(object sender, RoutedEventArgs e)
         {

@@ -22,6 +22,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             _context = new UniversityRoomBookingContext();
             _currentUser = currentUser;
             LoadRoomSlots();
+            DashboardWindow dashboard = new DashboardWindow(_currentUser);
+            dashboard.Close();
         }
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
@@ -171,6 +173,9 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             {
                 LoadRoomSlots();
             }
+            DashboardWindow dashboard = new DashboardWindow(_currentUser);
+            dashboard.Show();
+            this.Close();
         }
     }
 }
