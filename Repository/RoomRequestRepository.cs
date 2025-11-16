@@ -26,7 +26,20 @@ namespace UniversityClassroomBookingManagement.Repositories
                 requestId);
         }
 
-
+        public bool IsStudentLockedInSlot(int studentId, int slotId, DateOnly intendedDate)
+        {
+            return _context.Database.SqlQueryRaw<int>(
+                @"SELECT TOP 1 CAST(1 AS INT) AS IsLocked
+          FROM RoomRequest_Participant rp
+          JOIN RoomRequest r ON r.request_id = rp.request_id
+          WHERE rp.student_id = {0}
+            AND rp.status IN ('pending','accepted')
+            AND r.slot_id = {1}
+            AND r.intended_date = {2}
+            AND r.status NOT IN ('rejected','cancelled')",
+                studentId, slotId, intendedDate
+            ).Any();
+        }
         public List<RoomRequest> GetRequestsByUser(int userId)
         {
             try
@@ -189,42 +202,48 @@ namespace UniversityClassroomBookingManagement.Repositories
                 var req = _context.RoomRequests.FirstOrDefault(r => r.RequestId == requestId);
                 if (req == null)
                 {
-                    MessageBox.Show("Request not found.", "Notification");
+                    MessageBox.Show("Request not found.", "Error");
                     return false;
                 }
 
                 if (req.Status != "pending")
                 {
-                    MessageBox.Show("Only pending requests can have participants added.", "Warning");
+                    MessageBox.Show("Only pending requests can add participants.", "Warning");
                     return false;
                 }
+
                 bool exists = _context.Database.SqlQueryRaw<int>(
                     @"SELECT TOP 1 1 
-                      FROM RoomRequest_Participant 
-                      WHERE request_id = {0} AND student_id = {1}",
-                    requestId, studentId
-                ).Any();
+                          FROM RoomRequest_Participant
+                       WHERE request_id = {0} AND student_id = {1}",
+                    requestId, studentId).Any();
 
                 if (exists)
                 {
-                    MessageBox.Show("This student is already a participant.", "Notification");
+                    MessageBox.Show("This student is already in the participant list.", "Duplicate");
                     return false;
                 }
+
+                if (IsStudentLockedInSlot(studentId, req.SlotId, req.IntendedDate))
+                {
+                    MessageBox.Show(
+                        "This student already has a pending/accepted booking in this time slot.",
+                        "Locked", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
                 _context.Database.ExecuteSqlRaw(
                     "INSERT INTO RoomRequest_Participant (request_id, student_id) VALUES ({0}, {1})",
                     requestId, studentId);
-
-                _context.SaveChanges();
 
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error while adding participant:\n" + ex.Message, "System Error");
+                MessageBox.Show("Error while adding participant:\n" + ex.Message, "Error");
                 return false;
             }
         }
-
         public RoomRequest? GetRequestById(int requestId)
         {
             try

@@ -148,16 +148,11 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 MessageBox.Show("Please enter a purpose for your booking.", "Warning");
                 return;
             }
-
             if (_isAddMode)
             {
                 if (_currentUser.Role == "Student")
                 {
-                    int distinctParticipantCount = _participants
-                        .Select(p => p.UserId)
-                        .Distinct()
-                        .Count();
-
+                    int distinctParticipantCount = _participants.Select(p => p.UserId).Distinct().Count();
                     if (distinctParticipantCount < 2)
                     {
                         MessageBox.Show(
@@ -169,7 +164,32 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                         return;
                     }
                 }
-
+                var repo = new RoomRequestRepository();
+                if (repo.IsStudentLockedInSlot(_currentUser.UserId, _request.SlotId, _request.IntendedDate))
+                {
+                    MessageBox.Show(
+                        "You cannot create this booking because you already have a pending/accepted request at the same date & slot.",
+                        "Requester Locked",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                    return;
+                }
+                foreach (var stu in _participants.Select(p => p.UserId).Distinct())
+                {
+                    if (repo.IsStudentLockedInSlot(stu, _request.SlotId, _request.IntendedDate))
+                    {
+                        MessageBox.Show(
+                            $"Cannot create request because participant is locked:\n\n" +
+                            $"- {_participants.First(p => p.UserId == stu).FullName}\n\n" +
+                            "They already have a pending/accepted request at this date and slot.",
+                            "Participant Conflict",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning
+                        );
+                        return;
+                    }
+                }
                 try
                 {
                     using (var context = new UniversityRoomBookingContext())
@@ -186,29 +206,21 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                         };
 
                         context.RoomRequests.Add(newRequest);
-                        context.SaveChanges(); 
+                        context.SaveChanges();
+
                         if (_currentUser.Role == "Student")
                         {
-                            var distinctParticipantIds = _participants
-                                .Select(p => p.UserId)
-                                .Distinct()
-                                .ToList();
-
-                            foreach (int studentId in distinctParticipantIds)
+                            foreach (int studentId in _participants.Select(x => x.UserId).Distinct())
                             {
                                 context.Database.ExecuteSqlRaw(
                                     "INSERT INTO RoomRequest_Participant (request_id, student_id) VALUES ({0}, {1})",
-                                    newRequest.RequestId, studentId
-                                );
+                                    newRequest.RequestId, studentId);
                             }
                         }
 
-                        MessageBox.Show(
-                            "Booking request created successfully!",
-                            "Success",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information
-                        );
+                        MessageBox.Show("Booking request created successfully!",
+                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
                         this.DialogResult = true;
                         Close();
                     }
@@ -217,14 +229,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 {
                     MessageBox.Show(
                         "Error while creating booking request:\n" + ex.Message,
-                        "Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error
                     );
                 }
 
                 return;
             }
+
             if (_request.Status != "pending")
             {
                 MessageBox.Show("Only pending requests can be modified!", "Warning");
@@ -243,14 +254,14 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             if (_isAddMode)
             {
-                var addWindow = new AddParticipantWindow(lstParticipants);
+                var addWindow = new AddParticipantWindow(lstParticipants, _currentUser);
                 addWindow.ShowDialog();
                 _participants = lstParticipants.Items.Cast<User>().ToList();
                 lstParticipants.Items.Refresh();
                 return;
             }
 
-            var addExisting = new AddParticipantWindow(_requestId);
+            var addExisting = new AddParticipantWindow(_requestId, _currentUser);
             addExisting.ShowDialog();
             LoadData();
         }

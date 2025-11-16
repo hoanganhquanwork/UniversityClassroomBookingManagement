@@ -15,22 +15,27 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         private readonly ListBox? _targetListBox;
         private readonly bool _isTemporary;
         private List<User> _students;
-
-        public AddParticipantWindow(int requestId)
+        private RoomRequest? _currentRequest;
+        private User _currentUser;
+        public AddParticipantWindow(int requestId,User currentUser )
         {
             InitializeComponent();
             _userRepo = new UserRepository();
             _reqRepo = new RoomRequestRepository();
             _requestId = requestId;
+            _currentUser = currentUser;
             _isTemporary = false;
+
+            _currentRequest = _reqRepo.GetRequestById(requestId);
             LoadStudents();
         }
 
-        public AddParticipantWindow(ListBox targetListBox)
+        public AddParticipantWindow(ListBox targetListBox, User currentUser)
         {
             InitializeComponent();
             _userRepo = new UserRepository();
             _reqRepo = new RoomRequestRepository();
+            _currentUser = currentUser;
             _targetListBox = targetListBox;
             _isTemporary = true;
             LoadStudents();
@@ -41,7 +46,10 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             try
             {
                 _students = _userRepo.GetAllUsers()
-                    .Where(u => u.Role == "Student")
+                    .Where(u =>
+                           u.Role == "Student"
+                        && _currentUser != null
+                        && u.UserId != _currentUser.UserId) 
                     .OrderBy(u => u.FullName)
                     .ToList();
             }
@@ -65,8 +73,8 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
             var filtered = _students
                 .Where(s =>
-                    (!string.IsNullOrEmpty(s.FullName) && s.FullName.ToLower().Contains(keyword)) ||
-                    (!string.IsNullOrEmpty(s.Username) && s.Username.ToLower().Contains(keyword)) ||
+                    (s.FullName?.ToLower().Contains(keyword) == true) ||
+                    (s.Username?.ToLower().Contains(keyword) == true) ||
                     s.UserId.ToString().Contains(keyword))
                 .Take(15)
                 .ToList();
@@ -74,13 +82,13 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             lstSuggestions.ItemsSource = filtered;
         }
 
+
         private void lstSuggestions_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (lstSuggestions.SelectedItem is not User selected) return;
 
             if (_isTemporary)
-            {
-                var currentList = _targetListBox!.ItemsSource as List<User>
+            {                var currentList = (_targetListBox!.ItemsSource as List<User>)
                                   ?? _targetListBox.Items.Cast<User>().ToList();
 
                 if (currentList.Any(u => u.UserId == selected.UserId))
@@ -88,6 +96,19 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                     MessageBox.Show($"{selected.FullName} is already in the list.", "Duplicate",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
+                }
+                if (_currentRequest != null)
+                {
+                    if (_reqRepo.IsStudentLockedInSlot(selected.UserId, _currentRequest.SlotId, _currentRequest.IntendedDate))
+                    {
+                        MessageBox.Show(
+                            $"{selected.FullName} cannot be added because they already have a pending/accepted booking at the same date & slot.",
+                            "Participant Locked",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning
+                        );
+                        return;
+                    }
                 }
 
                 if (MessageBox.Show($"Add {selected.FullName} to this request?",
@@ -111,6 +132,20 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             }
             else
             {
+                if (_currentRequest != null)
+                {
+                    if (_reqRepo.IsStudentLockedInSlot(selected.UserId, _currentRequest.SlotId, _currentRequest.IntendedDate))
+                    {
+                        MessageBox.Show(
+                            $"{selected.FullName} cannot be added because they already have a pending/accepted booking at the same date & slot.",
+                            "Participant Locked",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+
+                        return;
+                    }
+                }
+
                 if (MessageBox.Show($"Are you sure you want to add {selected.FullName} to this request?",
                     "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
