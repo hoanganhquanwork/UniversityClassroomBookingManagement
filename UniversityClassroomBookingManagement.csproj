@@ -42,22 +42,16 @@
 	  </Content>
 	  <Resource Include="Assets\avatar\3.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="Assets\avatar\4.png">
+	  </Content>
+	  <Content Include="Assets\avatar\6.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="Assets\avatar\5.png">
+	  </Content>
+	  <Content Include="Assets\avatar\7.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="Assets\avatar\6.png">
+	  </Content>
+	  <Content Include="Assets\avatar\8.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="Assets\avatar\7.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="Assets\avatar\8.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
+	  </Content>
 	  <Resource Include="Assets\avatar\default.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>

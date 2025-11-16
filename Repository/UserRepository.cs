@@ -103,6 +103,56 @@ namespace UniversityClassroomBookingManagement.Repositories
                 return false;
             }
         }
+        public bool UpdateProfilePicture(int userId, string newPath)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null) return false;
+
+                user.ProfilePicture = newPath;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public bool UpdateStudentProfile(StudentProfile profile)
+        {
+            try
+            {
+                var existing = _context.StudentProfiles.FirstOrDefault(s => s.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Major = profile.Major;
+                existing.Address = profile.Address;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateLecturerProfile(LecturerProfile profile)
+        {
+            try
+            {
+                var existing = _context.LecturerProfiles.FirstOrDefault(l => l.UserId == profile.UserId);
+                if (existing == null) return false;
+
+                existing.Department = profile.Department;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public List<User> GetAllUsers()
         {
@@ -228,56 +278,6 @@ namespace UniversityClassroomBookingManagement.Repositories
             _context.Users.Remove(user);
             _context.SaveChanges();
             return true;
-        }
-    public bool UpdateProfilePicture(int userId, string newPath)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
-                if (user == null) return false;
-
-                user.ProfilePicture = newPath;
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        public bool UpdateStudentProfile(StudentProfile profile)
-        {
-            try
-            {
-                var existing = _context.StudentProfiles.FirstOrDefault(s => s.UserId == profile.UserId);
-                if (existing == null) return false;
-
-                existing.Major = profile.Major;
-                existing.Address = profile.Address;
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public bool UpdateLecturerProfile(LecturerProfile profile)
-        {
-            try
-            {
-                var existing = _context.LecturerProfiles.FirstOrDefault(l => l.UserId == profile.UserId);
-                if (existing == null) return false;
-
-                existing.Department = profile.Department;
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
         public StaffProfile? GetStaffProfileByUserId(int userId)
         {
