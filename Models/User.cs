@@ -15,7 +15,7 @@ public partial class User
 
     public string FullName { get; set; } = null!;
 
-    public string Password { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
 
     public DateOnly? DateOfBirth { get; set; }
 
