@@ -72,7 +72,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         {
             try
             {
-                string defaultPath = "pack://application:,,,/Assets/avatar/default.png";
+                string defaultPath = "Assets/avatar/default.png";
                 if (string.IsNullOrEmpty(relativePath))
                 {
                     imgProfile.Source = new BitmapImage(new Uri(defaultPath));

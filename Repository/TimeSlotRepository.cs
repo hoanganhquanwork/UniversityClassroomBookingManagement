@@ -20,8 +20,6 @@ namespace UniversityRoomBooking.Repositories
                 .OrderBy(s => s.StartTime)
                 .ToList();
         }
-
-        // Add (check trùng & hợp lệ)
         public bool AddSlot(TimeSlot slot)
         {
             try

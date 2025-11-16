@@ -31,7 +31,9 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void LoadRoomSlots()
         {
-            var rooms = _roomRepo.GetAllRooms();
+            var rooms = _roomRepo.GetAllRooms()
+                .Where(r => r.Status == "available") .ToList();
+
             var slots = _context.TimeSlots.OrderBy(s => s.StartTime).ToList();
             var selectedDate = datePicker.SelectedDate ?? DateTime.Today;
 

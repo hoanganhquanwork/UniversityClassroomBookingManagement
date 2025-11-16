@@ -18,10 +18,6 @@ namespace UniversityClassroomBookingManagement.Views.sidebar
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Window.GetWindow(this) == null)
-            {
-                MessageBox.Show("Sidebar is not attached to the main window!");
-            }
         }
 
         public void SetCurrentUser(User user)

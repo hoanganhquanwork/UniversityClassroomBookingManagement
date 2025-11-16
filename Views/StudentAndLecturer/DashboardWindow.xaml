@@ -8,7 +8,7 @@
         Background="#F8F9FA"
         ResizeMode="NoResize">
 
-    <DockPanel Margin="0,0,0,-6">
+    <DockPanel Margin="0,0,0,0">
         <sidebar:Sidebar x:Name="sidebarControl" DockPanel.Dock="Left" Loaded="Sidebar_Loaded"/>
 
         <Grid Margin="25">
@@ -46,7 +46,7 @@
                              BorderBrush="#DDD"
                              BorderThickness="1"
                              VerticalContentAlignment="Center"
-                             ToolTip="Search by purpose, room, or note"
+                             ToolTip="Search by purpose, room"
                              TextChanged="TextBox_TextChanged"/>
 
                     <ComboBox x:Name="cboStatus"

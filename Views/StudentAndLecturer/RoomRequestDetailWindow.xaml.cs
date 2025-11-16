@@ -21,7 +21,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
         private RoomRequest _request;
         private List<User> _participants = new();
 
-        public RoomRequestDetailWindow(int requestId, User currentUser, bool isEditMode = false)
+        public RoomRequestDetailWindow(int requestId, User currentUser, bool isEditMode)
         {
             InitializeComponent();
             _repo = new RoomRequestRepository();

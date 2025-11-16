@@ -37,10 +37,6 @@
                     Padding="10"
                     Margin="0,0,0,15">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <ComboBox x:Name="cboCampus" Width="150" Height="34" Margin="0,0,10,0">
-                        <ComboBoxItem Content="FU-HL" IsSelected="True"/>
-                        <ComboBoxItem Content="FU-DN"/>
-                    </ComboBox>
 
                     <DatePicker x:Name="datePicker"
                                 Width="180" Height="34"
