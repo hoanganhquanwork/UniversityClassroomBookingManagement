@@ -37,9 +37,9 @@
   <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 </ItemGroup>
 	<ItemGroup>
-	  <Resource Include="Assets\avatar\2.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Resource>
+	  <Content Include="Assets\avatar\2.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	  <Resource Include="Assets\avatar\3.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>

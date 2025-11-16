@@ -11,7 +11,7 @@ public partial class StudentProfile
 
     public string? Address { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<RoomRequestParticipant> RoomRequestParticipants { get; set; } = new List<RoomRequestParticipant>();
 
-    public virtual ICollection<RoomRequest> Requests { get; set; } = new List<RoomRequest>();
+    public virtual User User { get; set; } = null!;
 }

@@ -20,12 +20,7 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                return _context.RoomRequests
-                    .Include(r => r.Room)
-                    .Include(r => r.Slot)
-                    .Where(r => r.RequesterId == userId)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .ToList();
+                return _context.RoomRequests.Include(r => r.Room).Include(r => r.Slot).Where(r => r.RequesterId == userId).OrderByDescending(r => r.CreatedAt).ToList();
             }
             catch (Exception ex)
             {
@@ -140,9 +135,7 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                var studentIds = _context.Database
-                    .SqlQueryRaw<int>("SELECT student_id FROM RoomRequest_Participant WHERE request_id = {0}", requestId)
-                    .ToList();
+                var studentIds = _context.Database.SqlQueryRaw<int>("SELECT student_id FROM RoomRequest_Participant WHERE request_id = {0}", requestId).ToList();
 
                 if (!studentIds.Any())
                     return new List<User>();
@@ -364,9 +357,7 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                var req = _context.RoomRequests
-                    .Include(r => r.Slot)
-                    .FirstOrDefault(r => r.RequestId == requestId);
+                var req = _context.RoomRequests.Include(r => r.Slot).FirstOrDefault(r => r.RequestId == requestId);
 
                 if (req == null) return false;
 

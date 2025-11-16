@@ -190,12 +190,6 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 return;
             }
 
-            if (_request.Requester?.Role != "Student")
-            {
-                MessageBox.Show("Only students can edit requests!", "Warning");
-                return;
-            }
-
             if (_request.Status != "pending")
             {
                 MessageBox.Show("Only pending requests can be modified!", "Warning");

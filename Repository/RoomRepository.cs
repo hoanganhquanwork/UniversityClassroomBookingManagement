@@ -18,26 +18,19 @@ namespace UniversityRoomBooking.Repositories
         // --- READ ALL ROOMS ---
         public List<Room> GetAllRooms()
         {
-            return _context.Rooms
-                .Include(r => r.Building)
-                .OrderBy(r => r.RoomId)
-                .ToList();
+            return _context.Rooms.Include(r => r.Building).OrderBy(r => r.RoomId).ToList();
         }
 
         // --- GET ONE ROOM ---
         public Room GetRoomById(int id)
         {
-            return _context.Rooms
-                .Include(r => r.Building)
-                .FirstOrDefault(r => r.RoomId == id);
+            return _context.Rooms.Include(r => r.Building).FirstOrDefault(r => r.RoomId == id);
         }
 
         // --- GET ALL BUILDINGS (for ComboBox) ---
         public List<Building> GetAllBuildings()
         {
-            return _context.Buildings
-                .OrderBy(b => b.BuildingName)
-                .ToList();
+            return _context.Buildings.OrderBy(b => b.BuildingName).ToList();
         }
 
         // --- ADD ---
@@ -92,9 +85,7 @@ namespace UniversityRoomBooking.Repositories
         // --- FILTER ROOMS ---
         internal List<Room> FilteredRooms(string? nameFilter, int? buildingId)
         {
-            var query = _context.Rooms
-                .Include(r => r.Building)
-                .AsQueryable();
+            var query = _context.Rooms.Include(r => r.Building).AsQueryable();
 
             nameFilter = nameFilter?.Trim().ToLower();
 

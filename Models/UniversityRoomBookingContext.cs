@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace UniversityClassroomBookingManagement.Models;
 
@@ -27,6 +25,8 @@ public partial class UniversityRoomBookingContext : DbContext
 
     public virtual DbSet<RoomRequest> RoomRequests { get; set; }
 
+    public virtual DbSet<RoomRequestParticipant> RoomRequestParticipants { get; set; }
+
     public virtual DbSet<StaffProfile> StaffProfiles { get; set; }
 
     public virtual DbSet<StudentProfile> StudentProfiles { get; set; }
@@ -36,24 +36,18 @@ public partial class UniversityRoomBookingContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=(local);Database=University_Room_Booking;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
 
-        var connectionString = configuration.GetConnectionString("DBDefault");
-        optionsBuilder.UseSqlServer(connectionString);
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Booking>(entity =>
         {
-            entity.HasKey(e => e.BookingId).HasName("PK__Booking__5DE3A5B14B9270EF");
+            entity.HasKey(e => e.BookingId).HasName("PK__Booking__5DE3A5B1D750BAF4");
 
             entity.ToTable("Booking");
 
-            entity.HasIndex(e => e.RequestId, "UQ__Booking__18D3B90EACB2C508").IsUnique();
+            entity.HasIndex(e => e.RequestId, "UQ__Booking__18D3B90E25407260").IsUnique();
 
             entity.Property(e => e.BookingId).HasColumnName("booking_id");
             entity.Property(e => e.ApprovedBy).HasColumnName("approved_by");
@@ -72,30 +66,30 @@ public partial class UniversityRoomBookingContext : DbContext
 
             entity.HasOne(d => d.ApprovedByNavigation).WithMany(p => p.BookingApprovedByNavigations)
                 .HasForeignKey(d => d.ApprovedBy)
-                .HasConstraintName("FK__Booking__approve__373B3228");
+                .HasConstraintName("FK__Booking__approve__39237A9A");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BookingCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Booking__created__36470DEF");
+                .HasConstraintName("FK__Booking__created__382F5661");
 
             entity.HasOne(d => d.Request).WithOne(p => p.Booking)
                 .HasForeignKey<Booking>(d => d.RequestId)
-                .HasConstraintName("FK__Booking__request__336AA144");
+                .HasConstraintName("FK__Booking__request__3552E9B6");
 
             entity.HasOne(d => d.Room).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.RoomId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Booking__room_id__345EC57D");
+                .HasConstraintName("FK__Booking__room_id__36470DEF");
 
             entity.HasOne(d => d.Slot).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.SlotId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Booking__slot_id__3552E9B6");
+                .HasConstraintName("FK__Booking__slot_id__373B3228");
         });
 
         modelBuilder.Entity<Building>(entity =>
         {
-            entity.HasKey(e => e.BuildingId).HasName("PK__Building__9C9FBF7FCC48E135");
+            entity.HasKey(e => e.BuildingId).HasName("PK__Building__9C9FBF7F00BB8129");
 
             entity.ToTable("Building");
 
@@ -110,7 +104,7 @@ public partial class UniversityRoomBookingContext : DbContext
 
         modelBuilder.Entity<LecturerProfile>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Lecturer__B9BE370F04AD344F");
+            entity.HasKey(e => e.UserId).HasName("PK__Lecturer__B9BE370F3C374BCD");
 
             entity.ToTable("LecturerProfile");
 
@@ -128,7 +122,7 @@ public partial class UniversityRoomBookingContext : DbContext
 
         modelBuilder.Entity<Room>(entity =>
         {
-            entity.HasKey(e => e.RoomId).HasName("PK__Room__19675A8A02DCF8C0");
+            entity.HasKey(e => e.RoomId).HasName("PK__Room__19675A8A633EB8B2");
 
             entity.ToTable("Room");
 
@@ -149,12 +143,12 @@ public partial class UniversityRoomBookingContext : DbContext
             entity.HasOne(d => d.Building).WithMany(p => p.Rooms)
                 .HasForeignKey(d => d.BuildingId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Room__building_i__1F63A897");
+                .HasConstraintName("FK__Room__building_i__1C873BEC");
         });
 
         modelBuilder.Entity<RoomRequest>(entity =>
         {
-            entity.HasKey(e => e.RequestId).HasName("PK__RoomRequ__18D3B90F4EF412CC");
+            entity.HasKey(e => e.RequestId).HasName("PK__RoomRequ__18D3B90F0C1E9DA9");
 
             entity.ToTable("RoomRequest", tb => tb.HasTrigger("trg_AutoCreateBooking"));
 
@@ -206,30 +200,39 @@ public partial class UniversityRoomBookingContext : DbContext
                 .HasForeignKey(d => d.SlotId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__RoomReque__slot___2704CA5F");
+        });
 
-            entity.HasMany(d => d.Students).WithMany(p => p.Requests)
-                .UsingEntity<Dictionary<string, object>>(
-                    "RoomRequestParticipant",
-                    r => r.HasOne<StudentProfile>().WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__RoomReque__stude__2F9A1060"),
-                    l => l.HasOne<RoomRequest>().WithMany()
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__RoomReque__reque__2EA5EC27"),
-                    j =>
-                    {
-                        j.HasKey("RequestId", "StudentId").HasName("PK__RoomRequ__AA708966BCC1EA7C");
-                        j.ToTable("RoomRequest_Participant");
-                        j.IndexerProperty<int>("RequestId").HasColumnName("request_id");
-                        j.IndexerProperty<int>("StudentId").HasColumnName("student_id");
-                    });
+        modelBuilder.Entity<RoomRequestParticipant>(entity =>
+        {
+            entity.HasKey(e => new { e.RequestId, e.StudentId }).HasName("PK__RoomRequ__AA70896642EF323D");
+
+            entity.ToTable("RoomRequest_Participant", tb => tb.HasTrigger("trg_BlockDuplicateLockedMember"));
+
+            entity.Property(e => e.RequestId).HasColumnName("request_id");
+            entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.RespondedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("responded_at");
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("pending")
+                .HasColumnName("status");
+
+            entity.HasOne(d => d.Request).WithMany(p => p.RoomRequestParticipants)
+                .HasForeignKey(d => d.RequestId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__RoomReque__reque__2EA5EC27");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.RoomRequestParticipants)
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__RoomReque__stude__2F9A1060");
         });
 
         modelBuilder.Entity<StaffProfile>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__StaffPro__B9BE370F4076F033");
+            entity.HasKey(e => e.UserId).HasName("PK__StaffPro__B9BE370F5C833297");
 
             entity.ToTable("StaffProfile");
 
@@ -247,7 +250,7 @@ public partial class UniversityRoomBookingContext : DbContext
 
         modelBuilder.Entity<StudentProfile>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__StudentP__B9BE370FFCD710B6");
+            entity.HasKey(e => e.UserId).HasName("PK__StudentP__B9BE370F76B5824D");
 
             entity.ToTable("StudentProfile");
 
@@ -268,24 +271,26 @@ public partial class UniversityRoomBookingContext : DbContext
 
         modelBuilder.Entity<TimeSlot>(entity =>
         {
-            entity.HasKey(e => e.SlotId).HasName("PK__TimeSlot__971A01BBAABBA0BF");
+            entity.HasKey(e => e.SlotId).HasName("PK__TimeSlot__971A01BBDBD3CE64");
 
             entity.ToTable("TimeSlot");
 
-            entity.Property(e => e.SlotId).HasColumnName("slot_id");
+            entity.Property(e => e.SlotId)
+                .ValueGeneratedNever()
+                .HasColumnName("slot_id");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__B9BE370F8B3360BE");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__B9BE370FC7E9EF73");
 
             entity.ToTable(tb => tb.HasTrigger("trg_CreateProfile"));
 
-            entity.HasIndex(e => e.Email, "UQ__Users__AB6E6164DE0D3163").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__AB6E6164F654EB99").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__Users__F3DBC572703582EF").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__F3DBC5722FFE748E").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
@@ -304,10 +309,10 @@ public partial class UniversityRoomBookingContext : DbContext
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("gender");
-            entity.Property(e => e.PasswordHash)
+            entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .IsUnicode(false)
-                .HasColumnName("password_hash");
+                .HasColumnName("password");
             entity.Property(e => e.Phone)
                 .HasMaxLength(15)
                 .HasColumnName("phone");

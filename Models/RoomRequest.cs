@@ -39,7 +39,7 @@ public partial class RoomRequest
 
     public virtual Room Room { get; set; } = null!;
 
-    public virtual TimeSlot Slot { get; set; } = null!;
+    public virtual ICollection<RoomRequestParticipant> RoomRequestParticipants { get; set; } = new List<RoomRequestParticipant>();
 
-    public virtual ICollection<StudentProfile> Students { get; set; } = new List<StudentProfile>();
+    public virtual TimeSlot Slot { get; set; } = null!;
 }

@@ -16,12 +16,10 @@ namespace UniversityRoomBooking.Repositories
 
         public List<TimeSlot> GetAllSlots()
         {
-            return _context.TimeSlots
-                .OrderBy(s => s.StartTime)
-                .ToList();
+            return _context.TimeSlots.OrderBy(s => s.StartTime).ToList();
         }
 
-        // Add (check trùng & hợp lệ)
+        // Add 
         public bool AddSlot(TimeSlot slot)
         {
             try

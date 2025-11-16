@@ -70,15 +70,6 @@
                                 <ComboBoxItem Content="other"/>
                             </ComboBox>
                         </StackPanel>
-
-                        <StackPanel Width="300" Margin="10">
-                            <TextBlock Text="Role" FontWeight="Bold"/>
-                            <ComboBox x:Name="cbRole">
-                                <ComboBoxItem Content="Student"/>
-                                <ComboBoxItem Content="Lecturer"/>
-                                <ComboBoxItem Content="Staff"/>
-                            </ComboBox>
-                        </StackPanel>
                     </WrapPanel>
 
                     <StackPanel Margin="10">

@@ -120,7 +120,7 @@ namespace UniversityClassroomBookingManagement.Views.Staff
                 return;
             }
 
-            // Kiểm tra định dạng số điện thoại (VD: 10 số, chỉ số)
+            // Kiểm tra định dạng số điện thoại 
             if (!System.Text.RegularExpressions.Regex.IsMatch(txtPhone.Text.Trim(),
                 @"^[0-9]{9,11}$"))
             {
@@ -146,11 +146,11 @@ namespace UniversityClassroomBookingManagement.Views.Staff
                 return;
             }
 
-            // Kiểm tra tuổi tối thiểu (VD: >=18 tuổi)
+            // Kiểm tra tuổi tối thiểu ( >=18 tuổi)
             var dob = dpDateOfBirth.SelectedDate.Value;
             if (dob > DateTime.Now.AddYears(-18))
             {
-                MessageBox.Show("⚠️ Staff must be at least 18 years old.", "Validation Error",
+                MessageBox.Show("Staff must be at least 18 years old.", "Validation Error",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 dpDateOfBirth.Focus();
                 return;

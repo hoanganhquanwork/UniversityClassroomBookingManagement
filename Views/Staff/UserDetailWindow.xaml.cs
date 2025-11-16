@@ -50,16 +50,6 @@ namespace UniversityRoomBooking.Views
                     break;
                 }
             }
-
-            cbRole.SelectedItem = null;
-            foreach (var item in cbRole.Items)
-            {
-                if ((item as System.Windows.Controls.ComboBoxItem)?.Content.ToString() == _user.Role)
-                {
-                    cbRole.SelectedItem = item;
-                    break;
-                }
-            }
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -84,7 +74,6 @@ namespace UniversityRoomBooking.Views
             else
                 _user.DateOfBirth = null; 
             _user.Gender = (cbGender.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content.ToString();
-            _user.Role = (cbRole.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content.ToString();
 
             if (_repo.UpdateUser(_user))
             {

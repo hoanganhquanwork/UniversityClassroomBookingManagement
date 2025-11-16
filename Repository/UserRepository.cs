@@ -104,9 +104,6 @@ namespace UniversityClassroomBookingManagement.Repositories
             }
         }
 
-        // ============================================================
-        // 🔹 ADMIN MANAGEMENT - CRUD & FILTER
-        // ============================================================
         public List<User> GetAllUsers()
         {
             return _context.Users

@@ -16,9 +16,7 @@ namespace UniversityRoomBooking.Repositories
         // Lấy tất cả
         public List<Building> GetAllBuildings()
         {
-            return _context.Buildings
-                .OrderBy(b => b.BuildingId)
-                .ToList();
+            return _context.Buildings.OrderBy(b => b.BuildingId).ToList();
         }
 
         // Thêm (check trùng tên)
@@ -67,10 +65,7 @@ namespace UniversityRoomBooking.Repositories
         public List<Building> SearchBuilding(string keyword)
         {
             keyword = keyword?.Trim().ToLower() ?? "";
-            return _context.Buildings
-                .Where(b => b.BuildingName.ToLower().Contains(keyword))
-                .OrderBy(b => b.BuildingId)
-                .ToList();
+            return _context.Buildings.Where(b => b.BuildingName.ToLower().Contains(keyword)).OrderBy(b => b.BuildingId).ToList();
         }
     }
 }
