@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.EntityFrameworkCore;
 using UniversityClassroomBookingManagement.Models;
 using UniversityClassroomBookingManagement.Repositories;
 using UniversityRoomBooking.Repositories;
@@ -22,6 +23,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             _context = new UniversityRoomBookingContext();
             _currentUser = currentUser;
             LoadRoomSlots();
+
             DashboardWindow dashboard = new DashboardWindow(_currentUser);
             dashboard.Close();
         }
@@ -33,12 +35,24 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
         private void LoadRoomSlots()
         {
-            var rooms = _roomRepo.GetAllRooms().Where(r => r.Status == "available").ToList();
-            var slots = _context.TimeSlots.OrderBy(s => s.StartTime).ToList();
+            _context.Database.ExecuteSqlRaw("EXEC sp_ExpirePendingParticipants");
+
+            var rooms = _roomRepo.GetAllRooms()
+                .Where(r => r.Status == "available")
+                .ToList();
+
+            var slots = _context.TimeSlots
+                .OrderBy(s => s.StartTime)
+                .ToList();
+
             var selectedDate = datePicker.SelectedDate ?? DateTime.Today;
+            var intendedDate = DateOnly.FromDateTime(selectedDate);
 
             var bookedSlots = _context.RoomRequests
-                .Where(r => r.IntendedDate == DateOnly.FromDateTime(selectedDate) && r.Status != "Rejected")
+                .Where(r =>
+                    r.IntendedDate == intendedDate &&
+                    r.Status != "rejected" &&
+                    r.Status != "cancelled")
                 .Select(r => new { r.RoomId, r.SlotId, r.Purpose })
                 .ToList();
 
@@ -84,7 +98,9 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 dynamic data = element.DataContext;
                 int roomId = (int)data.RoomId;
 
-                var booked = bookedSlots.Cast<dynamic>().FirstOrDefault(b => b.RoomId == roomId && b.SlotId == slotId);
+                var booked = bookedSlots.Cast<dynamic>()
+                    .FirstOrDefault(b => b.RoomId == roomId && b.SlotId == slotId);
+
                 var button = (Button)element;
 
                 if (booked != null)
@@ -114,17 +130,20 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 .GetValue(((FrameworkElement)sender).DataContext)!;
 
             var selectedDate = datePicker.SelectedDate ?? DateTime.Today;
+            var intendedDate = DateOnly.FromDateTime(selectedDate);
 
             if (selectedDate < DateTime.Today)
             {
-                MessageBox.Show("You cannot book rooms for past dates.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("You cannot book rooms for past dates.",
+                    "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             var slot = _context.TimeSlots.FirstOrDefault(s => s.SlotId == slotId);
             if (slot == null) return;
 
-            if (selectedDate == DateTime.Today && DateTime.Now.TimeOfDay > slot.StartTime.ToTimeSpan())
+            if (selectedDate == DateTime.Today &&
+                DateTime.Now.TimeOfDay > slot.StartTime.ToTimeSpan())
             {
                 MessageBox.Show("Cannot book for past time slots today.", "Warning");
                 return;
@@ -133,13 +152,45 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             bool isAlreadyBooked = _context.RoomRequests.Any(r =>
                 r.RoomId == roomId &&
                 r.SlotId == slotId &&
-                r.IntendedDate == DateOnly.FromDateTime(selectedDate) &&
-                r.Status != "Rejected");
+                r.IntendedDate == intendedDate &&
+                r.Status != "rejected" &&
+                r.Status != "cancelled");
 
             if (isAlreadyBooked)
             {
-                MessageBox.Show("This room has already been booked for this slot.", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("This room has already been booked for this slot.",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            bool hasOwnRequestSameSlot = _context.RoomRequests.Any(r =>
+                r.RequesterId == _currentUser.UserId &&
+                r.SlotId == slotId &&
+                r.IntendedDate == intendedDate &&
+                r.Status != "rejected" &&
+                r.Status != "cancelled");
+
+            bool isParticipantLocked = _context.Database.SqlQueryRaw<int>(
+                @"SELECT TOP 1 CAST(1 AS INT) AS IsLocked
+      FROM RoomRequest_Participant rp
+      JOIN RoomRequest r ON r.request_id = rp.request_id
+      WHERE rp.student_id = {0}
+        AND (rp.status = 'pending' OR rp.status = 'accepted')
+        AND r.slot_id = {1}
+        AND r.intended_date = {2}
+        AND r.status NOT IN ('rejected','cancelled')",
+                _currentUser.UserId, slotId, intendedDate
+            ).Any();
+
+            if (hasOwnRequestSameSlot || isParticipantLocked)
+            {
+                MessageBox.Show(
+                    "You already have a booking or a pending/accepted invitation at this time slot.\n" +
+                    "You cannot create another request for the same date and slot.",
+                    "Already locked",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
                 return;
             }
 
@@ -154,6 +205,7 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
 
                 DateTime startOfWeek = selectedDate.AddDays(-(int)selectedDate.DayOfWeek + (int)DayOfWeek.Monday);
                 DateTime endOfWeek = startOfWeek.AddDays(6);
+
                 int count = _context.RoomRequests
                     .Count(r => r.RequesterId == _currentUser.UserId &&
                                 r.IntendedDate >= DateOnly.FromDateTime(startOfWeek) &&
@@ -166,13 +218,20 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
                 }
             }
 
-            var createWindow = new RoomRequestDetailWindow(roomId, slotId, DateOnly.FromDateTime(selectedDate), _currentUser);
+            var createWindow = new RoomRequestDetailWindow(
+                roomId,
+                slotId,
+                intendedDate,
+                _currentUser
+            );
+
             bool? result = createWindow.ShowDialog();
 
             if (result == true)
             {
                 LoadRoomSlots();
             }
+
             DashboardWindow dashboard = new DashboardWindow(_currentUser);
             dashboard.Show();
             this.Close();

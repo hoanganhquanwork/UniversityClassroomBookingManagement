@@ -15,12 +15,28 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             _context = new UniversityRoomBookingContext();
         }
+        private void FreeParticipants(int requestId)
+        {
+            _context.Database.ExecuteSqlRaw(
+                @"UPDATE RoomRequest_Participant
+                  SET status = 'rejected',
+                      responded_at = ISNULL(responded_at, GETDATE())
+                  WHERE request_id = {0}
+                    AND status IN ('pending','accepted')",
+                requestId);
+        }
+
 
         public List<RoomRequest> GetRequestsByUser(int userId)
         {
             try
             {
-                return _context.RoomRequests.Include(r => r.Room).Include(r => r.Slot).Where(r => r.RequesterId == userId).OrderByDescending(r => r.CreatedAt).ToList();
+                return _context.RoomRequests
+                    .Include(r => r.Room)
+                    .Include(r => r.Slot)
+                    .Where(r => r.RequesterId == userId)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -89,9 +105,17 @@ namespace UniversityClassroomBookingManagement.Repositories
 
                 req.Status = "cancelled";
                 req.UpdatedAt = DateTime.Now;
+
+                var booking = _context.Bookings.FirstOrDefault(b => b.RequestId == id);
+                if (booking != null)
+                {
+                    booking.Status = "cancelled";
+                }
+                FreeParticipants(id);
+
                 _context.SaveChanges();
 
-                MessageBox.Show("Request canceled successfully.", "Success");
+                MessageBox.Show("Request canceled successfully!", "Success");
                 return true;
             }
             catch (Exception ex)
@@ -117,6 +141,8 @@ namespace UniversityClassroomBookingManagement.Repositories
                     MessageBox.Show("Only pending requests can be deleted.", "Warning");
                     return false;
                 }
+                _context.Database.ExecuteSqlRaw(
+                    "DELETE FROM RoomRequest_Participant WHERE request_id = {0}", id);
 
                 _context.RoomRequests.Remove(req);
                 _context.SaveChanges();
@@ -135,7 +161,9 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                var studentIds = _context.Database.SqlQueryRaw<int>("SELECT student_id FROM RoomRequest_Participant WHERE request_id = {0}", requestId).ToList();
+                var studentIds = _context.Database.SqlQueryRaw<int>(
+                        "SELECT student_id FROM RoomRequest_Participant WHERE request_id = {0}", requestId)
+                    .ToList();
 
                 if (!studentIds.Any())
                     return new List<User>();
@@ -170,17 +198,18 @@ namespace UniversityClassroomBookingManagement.Repositories
                     MessageBox.Show("Only pending requests can have participants added.", "Warning");
                     return false;
                 }
+                bool exists = _context.Database.SqlQueryRaw<int>(
+                    @"SELECT TOP 1 1 
+                      FROM RoomRequest_Participant 
+                      WHERE request_id = {0} AND student_id = {1}",
+                    requestId, studentId
+                ).Any();
 
-                int exists = _context.RoomRequests
-                    .FromSqlRaw("SELECT * FROM RoomRequest_Participant WHERE request_id = {0} AND student_id = {1}", requestId, studentId)
-                    .Count();
-
-                if (exists > 0)
+                if (exists)
                 {
                     MessageBox.Show("This student is already a participant.", "Notification");
                     return false;
                 }
-
                 _context.Database.ExecuteSqlRaw(
                     "INSERT INTO RoomRequest_Participant (request_id, student_id) VALUES ({0}, {1})",
                     requestId, studentId);
@@ -200,7 +229,11 @@ namespace UniversityClassroomBookingManagement.Repositories
         {
             try
             {
-                return _context.RoomRequests.Include(r => r.Room).Include(r => r.Slot).Include(r => r.Requester).FirstOrDefault(r => r.RequestId == requestId);
+                return _context.RoomRequests
+                    .Include(r => r.Room)
+                    .Include(r => r.Slot)
+                    .Include(r => r.Requester)
+                    .FirstOrDefault(r => r.RequestId == requestId);
             }
             catch (Exception ex)
             {
@@ -276,7 +309,7 @@ namespace UniversityClassroomBookingManagement.Repositories
         // ============================================================
         // STAFF
         // ============================================================
-        
+
         public List<RoomRequest> FilterRequests(DateTime date, string status, string? buildingName)
         {
             try
