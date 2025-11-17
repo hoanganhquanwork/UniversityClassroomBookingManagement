@@ -22,12 +22,18 @@ namespace UniversityClassroomBookingManagement.Views.StudentAndLecturer
             _roomRepo = new RoomRepository();
             _context = new UniversityRoomBookingContext();
             _currentUser = currentUser;
+            if (!datePicker.SelectedDate.HasValue)
+            {
+                datePicker.SelectedDate = DateTime.Today;
+            }
             LoadRoomSlots();
-
-            DashboardWindow dashboard = new DashboardWindow(_currentUser);
-            dashboard.Close();
         }
+        private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        { 
+            if (!IsLoaded) return;
 
+            LoadRoomSlots();  
+        }
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
         {
             sidebarControl.SetCurrentUser(_currentUser);

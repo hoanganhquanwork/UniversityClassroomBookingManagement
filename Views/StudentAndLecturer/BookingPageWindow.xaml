@@ -42,7 +42,8 @@
                                 Width="180" Height="34"
                                 SelectedDate="{x:Static sys:DateTime.Now}"
                                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                                Margin="0,0,10,0"/>
+                                Margin="0,0,10,0"
+                                SelectedDateChanged="datePicker_SelectedDateChanged"/>
 
                     <Button Content="View"
                             Width="100" Height="34"
